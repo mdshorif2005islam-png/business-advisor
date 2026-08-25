@@ -1,13 +1,13 @@
 // ============================================
-// বিজনেস উপদেষ্টা — শোরিফ AI (পাসওয়ার্ড প্রটেক্টেড)
+// ফ্রি নলেজ ইঞ্জিন — উইকিপিডিয়া + নিউজ + লোকাল
 // ============================================
 
 document.addEventListener('DOMContentLoaded', function() {
 
     // ============================================
-    // ১. পাসওয়ার্ড সিস্টেম
+    // ১. পাসওয়ার্ড সিস্টেম (আগের মতো)
     // ============================================
-    var CORRECT_PASSWORD = 'shorif123'; // ← তোমার পাসওয়ার্ড সেট করো
+    var CORRECT_PASSWORD = 'shorif123';
     var MAX_ATTEMPTS = 5;
     var attempts = 0;
 
@@ -20,7 +20,6 @@ document.addEventListener('DOMContentLoaded', function() {
     function unlockApp() {
         lockScreen.style.display = 'none';
         mainContent.style.display = 'block';
-        // ক্লিয়ার করা
         passwordInput.value = '';
         lockError.innerHTML = '';
         attempts = 0;
@@ -34,12 +33,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     unlockBtn.addEventListener('click', function() {
         var entered = passwordInput.value.trim();
-
         if (entered === '') {
             showError('⚠️ দয়া করে কোড দিন।');
             return;
         }
-
         if (entered === CORRECT_PASSWORD) {
             unlockApp();
         } else {
@@ -55,12 +52,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // এন্টার প্রেস
     passwordInput.addEventListener('keypress', function(e) {
         if (e.key === 'Enter') unlockBtn.click();
     });
 
-    // পেজ রিফ্রেশে রিসেট
     window.addEventListener('load', function() {
         lockScreen.style.display = 'flex';
         mainContent.style.display = 'none';
@@ -71,7 +66,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // ============================================
-    // ২. চ্যাট ফাংশন (আগের মতো)
+    // ২. চ্যাট এলিমেন্ট সিলেক্ট
     // ============================================
     var chatBox = document.getElementById('chatBox');
     var userInput = document.getElementById('userInput');
@@ -79,47 +74,130 @@ document.addEventListener('DOMContentLoaded', function() {
     var actionBtns = document.querySelectorAll('.action');
     var chips = document.querySelectorAll('.chip');
 
-    function getAdvisorReply(question) {
-        var q = question.toLowerCase().trim();
+    // ============================================
+    // ৩. উইকিপিডিয়া থেকে তথ্য আনা (ফ্রি)
+    // ============================================
+    async function getWikipediaInfo(query) {
+        try {
+            // প্রথমে বাংলা উইকিপিডিয়া চেষ্টা
+            var bnUrl = `https://bn.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(query)}`;
+            var response = await fetch(bnUrl);
+            
+            if (response.ok) {
+                var data = await response.json();
+                if (data.extract) {
+                    return data.extract;
+                }
+            }
 
+            // না পেলে ইংরেজি উইকিপিডিয়া
+            var enUrl = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(query)}`;
+            response = await fetch(enUrl);
+            if (response.ok) {
+                data = await response.json();
+                if (data.extract) {
+                    return data.extract;
+                }
+            }
+            return null;
+        } catch (error) {
+            return null;
+        }
+    }
+
+    // ============================================
+    // ৪. গুগল নিউজ থেকে খবর আনা (ফ্রি RSS)
+    // ============================================
+    async function getNews(query) {
+        try {
+            var url = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=bn&gl=BD&ceid=BD:bn`;
+            var response = await fetch('https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(url));
+            
+            if (response.ok) {
+                var data = await response.json();
+                if (data.items && data.items.length > 0) {
+                    var newsText = '📰 সর্বশেষ খবর:\n';
+                    for (var i = 0; i < Math.min(3, data.items.length); i++) {
+                        newsText += `✅ ${data.items[i].title}\n`;
+                    }
+                    return newsText;
+                }
+            }
+            return null;
+        } catch (error) {
+            return null;
+        }
+    }
+
+    // ============================================
+    // ৫. লোকাল ডেটাবেস (দ্রুত উত্তরের জন্য)
+    // ============================================
+    function getLocalAnswer(q) {
+        // ব্যবসা সম্পর্কিত
         if (q.includes('আইডিয়া') || q.includes('ব্যবসা') || q.includes('কী ব্যবসা')) {
             var ideas = [
-                "স্যার, আপনি অনলাইন গ্রোসারি ডেলিভারি শুরু করতে পারেন — বর্তমানে খুব চাহিদা।",
-                "স্যার, ইকো-ফ্রেন্ডলি পণ্য (বাঁশ/জুটের তৈরি) এখন ট্রেন্ডিং।",
-                "স্যার, হোমমেড টিফিন সার্ভিস অফিস/কলেজ এলাকায় খুব চলছে।",
-                "স্যার, মোবাইল রিপেয়ার ও এক্সেসরিজ শপ — কম খরচে ভালো লাভ।",
-                "স্যার, অনলাইন টিউটোরিয়াল (স্কুল/কলেজ বিষয়) এখন ডিজিটাল যুগে দারুণ চলছে।"
+                "🛒 অনলাইন গ্রোসারি ডেলিভারি (স্থানীয় সবজি-মাছ)",
+                "👕 ইকো-ফ্রেন্ডলি ফ্যাশন ব্র্যান্ড (বাঁশ/জুটের তৈরি)",
+                "🍱 টিফিন সার্ভিস (অফিস/কলেজের জন্য হোমমেড খাবার)",
+                "📱 মোবাইল ফোন রিপেয়ার ও এক্সেসরিজ শপ",
+                "🎓 অনলাইন টিউটোরিয়াল (স্কুল/কলেজ বিষয়)",
+                "🧹 প্রফেশনাল হোম ক্লিনিং সার্ভিস"
             ];
             return "💡 " + ideas[Math.floor(Math.random() * ideas.length)];
         }
 
+        // লাভ
         if (q.includes('লাভ') || q.includes('বাড়াতে') || q.includes('মুনাফা')) {
             return "📈 স্যার, লাভ বাড়ানোর জন্য:\n✅ খরচ কমানো (সাপ্লায়ার পরিবর্তন)\n✅ নতুন পণ্য যোগ করা\n✅ অনলাইন মার্কেটিং বাড়ানো\n✅ গ্রাহকদের ফিডব্যাক নেওয়া";
         }
 
-        if (q.includes('কম বাজেট') || q.includes('ছোট ব্যবসা') || q.includes('টাকা কম')) {
-            return "💰 স্যার, কম বাজেটে (৫-২০ হাজার টাকা) ভালো ব্যবসা:\n✅ ফ্রিল্যান্সিং (কন্টেন্ট রাইটিং/ডিজাইন)\n✅ হোমমেড খাবার/টিফিন\n✅ মোবাইল রিপেয়ার\n✅ সোশ্যাল মিডিয়া ম্যানেজমেন্ট";
+        // বিনিয়োগ
+        if (q.includes('বিনিয়োগ') || q.includes('ইনভেস্ট')) {
+            return "🏦 স্যার, বিনিয়োগের আগে:\n✅ মার্কেট রিসার্চ করুন\n✅ ছোট স্কেলে টেস্ট করুন\n✅ ৬ মাসের ক্যাশ ফ্লো প্ল্যান করুন";
         }
 
+        // মার্কেটিং
         if (q.includes('মার্কেটিং') || q.includes('বিপণন') || q.includes('প্রচার')) {
-            return "📣 স্যার, মার্কেটিং টিপস:\n✅ ফেসবুক/ইনস্টাগ্রামে টার্গেটেড বিজ্ঞাপন\n✅ গ্রাহক রেফারেল প্রোগ্রাম\n✅ লোকাল ইভেন্টে স্পনসর\n✅ ইউটিউব রিভিউ ভিডিও তৈরি";
+            return "📣 স্যার, মার্কেটিং টিপস:\n✅ ফেসবুক/ইনস্টাগ্রামে টার্গেটেড বিজ্ঞাপন\n✅ গ্রাহক রেফারেল প্রোগ্রাম\n✅ লোকাল ইভেন্টে স্পনসর";
         }
 
-        if (q.includes('বিনিয়োগ') || q.includes('ইনভেস্ট') || q.includes('টাকা বিনিয়োগ')) {
-            return "🏦 স্যার, বিনিয়োগের আগে:\n✅ মার্কেট রিসার্চ করুন\n✅ ছোট স্কেলে টেস্ট করুন\n✅ ৬ মাসের ক্যাশ ফ্লো প্ল্যান করুন\n✅ ঝুঁকি বিশ্লেষণ করুন";
-        }
-
-        if (q.includes('ডকুমেন্ট') || q.includes('চিঠি') || q.includes('প্রস্তাব')) {
-            return "📄 স্যার, ব্যবসায়িক চিঠির জন্য আমি সাহায্য করতে পারি। নিচের 'ডকুমেন্ট প্রস্তাব' বাটনে ক্লিক করুন অথবা ক্লায়েন্টের নাম ও পণ্যের নাম লিখুন।";
-        }
-
+        // গ্রিটিং
         if (q.includes('আসসালামু') || q.includes('সালাম') || q.includes('হ্যালো') || q.includes('হাই')) {
             return "ওয়ালাইকুম আসসালাম, স্যার! আমি আপনার সেবায় আছি। কীভাবে সাহায্য করতে পারি?";
         }
 
-        return "স্যার, আমি আপনার প্রশ্ন বুঝতে পারিনি। দয়া করে নিচের অপশন থেকে বেছে নিন অথবা সহজভাবে প্রশ্নটি লিখুন।";
+        return null; // না পেলে null রিটার্ন
     }
 
+    // ============================================
+    // ৬. প্রধান উত্তর দান ফাংশন (হাইব্রিড)
+    // ============================================
+    async function getAdvisorReply(question) {
+        var q = question.toLowerCase().trim();
+
+        // ১. লোকাল ডেটাবেস চেক (দ্রুত)
+        var localAnswer = getLocalAnswer(q);
+        if (localAnswer) return localAnswer;
+
+        // ২. উইকিপিডিয়া চেক
+        var wikiAnswer = await getWikipediaInfo(q);
+        if (wikiAnswer) {
+            return "📚 উইকিপিডিয়া থেকে:\n" + wikiAnswer;
+        }
+
+        // ৩. নিউজ চেক
+        var newsAnswer = await getNews(q);
+        if (newsAnswer) {
+            return newsAnswer;
+        }
+
+        // ৪. কিছুই না পেলে
+        return "🤔 স্যার, আমি এই বিষয়ে তথ্য পাচ্ছি না। দয়া করে আরও সহজভাবে প্রশ্নটি বলুন।";
+    }
+
+    // ============================================
+    // ৭. মেসেজ যোগ করার ফাংশন
+    // ============================================
     function addMessage(sender, text) {
         var msgDiv = document.createElement('div');
         msgDiv.className = sender === 'advisor' ? 'advisor-msg' : 'user-msg';
@@ -128,32 +206,59 @@ document.addEventListener('DOMContentLoaded', function() {
         chatBox.scrollTop = chatBox.scrollHeight;
     }
 
-    sendBtn.addEventListener('click', function() {
+    // ============================================
+    // ৮. SEND বাটন (Async)
+    // ============================================
+    sendBtn.addEventListener('click', async function() {
         var msg = userInput.value.trim();
         if (msg === '') return;
+
         addMessage('user', msg);
-        addMessage('advisor', getAdvisorReply(msg));
+        
+        // লোডিং মেসেজ
+        var loadingId = 'loading-' + Date.now();
+        var loadingDiv = document.createElement('div');
+        loadingDiv.className = 'advisor-msg';
+        loadingDiv.id = loadingId;
+        loadingDiv.innerHTML = '🤔 খুঁজছি...';
+        chatBox.appendChild(loadingDiv);
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+        var reply = await getAdvisorReply(msg);
+        
+        // লোডিং মেসেজ রিপ্লেস
+        var loadingElement = document.getElementById(loadingId);
+        if (loadingElement) {
+            loadingElement.innerHTML = reply.replace(/\n/g, '<br>');
+        }
         userInput.value = '';
     });
 
+    // এন্টার প্রেস
     userInput.addEventListener('keypress', function(e) {
         if (e.key === 'Enter') sendBtn.click();
     });
 
+    // ============================================
+    // ৯. কুইক অ্যাকশন বাটন
+    // ============================================
     actionBtns.forEach(function(btn) {
         btn.addEventListener('click', function() {
             var action = this.dataset.action;
             var question = '';
-            if (action === 'idea') question = 'আমার ব্যবসার জন্য কোন আইডিয়া ভালো?';
-            else if (action === 'profit') question = 'আমি কীভাবে লাভ বাড়াতে পারি?';
-            else if (action === 'market') question = 'মার্কেটিং কীভাবে করব?';
-            else if (action === 'invest') question = 'বিনিয়োগ সম্পর্কে পরামর্শ দিন।';
-            else if (action === 'document') question = 'ডকুমেন্ট প্রস্তাব তৈরি করুন।';
-            addMessage('user', question);
-            addMessage('advisor', getAdvisorReply(question));
+            if (action === 'idea') question = 'ব্যবসার আইডিয়া দিন';
+            else if (action === 'profit') question = 'লাভ কীভাবে বাড়াব?';
+            else if (action === 'market') question = 'মার্কেটিং টিপস দিন';
+            else if (action === 'invest') question = 'বিনিয়োগ পরামর্শ দিন';
+            else if (action === 'document') question = 'ডকুমেন্ট প্রস্তাব তৈরি করুন';
+            userInput.value = question;
+            sendBtn.click();
         });
     });
 
+    // ============================================
+    // ১০. চিপস (দ্রুত প্রশ্ন)
+    // ============================================
     chips.forEach(function(chip) {
         chip.addEventListener('click', function() {
             userInput.value = this.dataset.question;
@@ -161,4 +266,4 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-});
+}); // DOMContentLoaded শেষ
