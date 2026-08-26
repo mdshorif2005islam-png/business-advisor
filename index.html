@@ -1,203 +1,351 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D AI Assistant Interface</title>
+    <title>AI Assistant - ChatGPT Style</title>
     <style>
-        body {
+        /* ChatGPT-এর ফন্ট */
+        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600&family=Hind+Siliguri:wght@400;500;700&display=swap');
+
+        * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            background-color: #0d0d2b; /* Deep Navy Background */
+        }
+
+        body {
+            font-family: 'Hind Siliguri', 'Sora', sans-serif;
+            background: #ffffff; /* ChatGPT-এর মতো সাদা ব্যাকগ্রাউন্ড */
             height: 100vh;
-            width: 100vw;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-family: 'Segoe UI', sans-serif;
-            overflow: hidden;
         }
 
-        /* Main Container for the whole scene */
-        .scene {
-            position: relative;
-            width: 1000px;
-            height: 700px;
-            background: radial-gradient(circle at 70% 80%, rgba(255, 140, 0, 0.6) 0%, rgba(0,0,0,0) 40%);
-        }
-
-        /* SVG Illustration placeholder */
-        svg {
-            position: absolute;
-            top: 0;
-            left: 0;
+        /* Main Layout - ChatGPT-এর মতো ফুল স্ক্রিন */
+        .chat-wrapper {
             width: 100%;
-            height: 100%;
+            max-width: 768px; /* GPT-এর কনটেইনার width */
+            height: 100vh;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05); /* সামান্য শ্যাডো */
         }
 
-        /* Laptop Screen Typing Area (Transparent and positioned exactly over the laptop) */
-        #laptop-screen-input {
-            position: absolute;
-            top: 37%;       /* Adjust to match exact laptop position */
-            left: 45.5%;    /* Adjust to match exact laptop position */
-            width: 110px;
-            height: 70px;
-            
-            background: transparent;
+        /* Header */
+        .chat-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #e5e5e5;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #ffffff;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .model-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #202123;
+        }
+
+        .online-status {
+            font-size: 12px;
+            color: #10a37f;
+            background: #e6f4f1;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        .header-right svg {
+            width: 20px;
+            height: 20px;
+            fill: #202123;
+            cursor: pointer;
+        }
+
+        /* Chat Area */
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            background: #ffffff;
+        }
+
+        .message-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        /* User Message Layout (ডান দিকে) */
+        .message-row.user {
+            justify-content: flex-end;
+        }
+
+        /* AI Message Layout (বাম দিকে) */
+        .message-row.ai {
+            justify-content: flex-start;
+        }
+
+        /* Avatar */
+        .avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 2px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .avatar.ai {
+            background: #10a37f;
+            color: white;
+            font-size: 16px;
+        }
+
+        .avatar.user {
+            background: #5436da; /* ChatGPT-এর ইউজার Avatar কালার */
+            color: white;
+            font-size: 16px;
+        }
+
+        /* Message Bubbles */
+        .message-text {
+            max-width: 100%;
+            font-size: 16px;
+            line-height: 1.7;
+            color: #374151;
+            padding-top: 4px;
+            white-space: pre-wrap;
+        }
+
+        .user .message-text {
+            background: #f4f4f4;
+            padding: 10px 15px;
+            border-radius: 8px;
+            color: #202123;
+        }
+
+        /* Typing Indicator (GPT-এর মতো) */
+        .typing-indicator {
+            display: none;
+            align-items: center;
+            gap: 5px;
+            padding-top: 5px;
+        }
+
+        .typing-indicator span {
+            width: 8px;
+            height: 8px;
+            background: #10a37f;
+            border-radius: 50%;
+            display: inline-block;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+
+        .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: translateY(0); opacity: 0.5; }
+            40% { transform: translateY(-5px); opacity: 1; }
+        }
+
+        /* Input Area - ChatGPT-এর হুবহু */
+        .input-area {
+            background: #ffffff;
+            padding: 20px 20px 30px 20px;
+            border-top: 1px solid #e5e5e5;
+        }
+
+        .input-box-wrapper {
+            position: relative;
+            max-width: 768px;
+            margin: 0 auto;
+            border: 1px solid #d1d5db;
+            border-radius: 12px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.05);
+            background: #ffffff;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .input-box-wrapper:focus-within {
+            border-color: #10a37f;
+            box-shadow: 0 0 0 3px rgba(16, 163, 127, 0.1);
+        }
+
+        textarea {
+            width: 100%;
+            padding: 14px 50px 14px 15px;
             border: none;
             outline: none;
-            
-            color: #1b1b1b;
-            font-size: 13px;
-            font-weight: bold;
-            text-align: center;
+            background: transparent;
+            font-family: inherit;
+            font-size: 16px;
+            line-height: 1.5;
             resize: none;
-            transform: rotate(-8deg); /* Matches the angle of the laptop */
-            z-index: 10;
+            max-height: 200px;
+            color: #202123;
         }
 
-        /* Floating Text Animation */
-        .float-text {
+        textarea::placeholder {
+            color: #9ca3af;
+        }
+
+        .send-btn {
             position: absolute;
-            color: #ffaa00;
-            font-size: 24px;
-            font-weight: 900;
-            text-shadow: 0 0 20px #ffaa00;
-            animation: floatUp 2s linear forwards;
-            pointer-events: none;
-            z-index: 50;
+            right: 10px;
+            bottom: 10px;
+            background: #10a37f;
+            color: white;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background 0.2s;
         }
 
-        @keyframes floatUp {
-            0% { opacity: 0; transform: translateY(0) scale(0.5); }
-            20% { opacity: 1; transform: translateY(-20px) scale(1); }
-            100% { opacity: 0; transform: translateY(-200px) scale(1.5) rotate(10deg); }
+        .send-btn:hover {
+            background: #0d8a6a;
+        }
+
+        /* Footer text */
+        .footer-text {
+            text-align: center;
+            font-size: 12px;
+            color: #9ca3af;
+            padding: 5px 0 15px 0;
         }
     </style>
 </head>
 <body>
 
-    <div class="scene">
-        <!-- এই SVG দিয়েই হুবহু ছবির 3D ডিজাইনটি আঁকা হয়েছে -->
-        <svg viewBox="0 0 1000 700" xmlns="http://www.w3.org/2000/svg">
-            <!-- Floor and Lighting -->
-            <ellipse cx="500" cy="600" rx="400" ry="100" fill="#ffa500" opacity="0.3"/>
-            <ellipse cx="700" cy="650" rx="300" ry="80" fill="#ff6347" opacity="0.2"/>
-
-            <!-- Table -->
-            <rect x="100" y="450" width="200" height="15" fill="#6b4226" rx="5"/>
-            <rect x="120" y="465" width="15" height="100" fill="#5a3520"/>
-            <rect x="270" y="465" width="15" height="100" fill="#5a3520"/>
-            <rect x="100" y="560" width="200" height="15" fill="#6b4226" rx="5"/>
-            <!-- Books on Table -->
-            <rect x="130" y="425" width="60" height="25" fill="#f4a261" rx="3"/>
-            <rect x="140" y="405" width="80" height="20" fill="#e76f51" rx="3"/>
-            <rect x="135" y="390" width="40" height="15" fill="#2a9d8f" rx="3"/>
-
-            <!-- Plant Pot -->
-            <path d="M 200 550 Q 200 450 250 450 Q 300 450 300 550 Z" fill="#1e5f74"/>
-            <rect x="210" y="440" width="80" height="20" fill="#134e5e"/>
-            <!-- Plant Leaves and Tulip -->
-            <path d="M 250 440 Q 200 350 220 300 Q 240 380 250 440" fill="#2a9d8f"/>
-            <path d="M 250 440 Q 280 300 290 280 Q 270 380 255 440" fill="#264653"/>
-            <path d="M 250 440 Q 250 350 270 330 Q 260 390 255 440" fill="#e9c46a"/>
-            <path d="M 250 440 Q 230 320 240 300 Q 245 380 245 440" fill="#2a9d8f"/>
-            <!-- Tulip Flower -->
-            <path d="M 270 330 Q 250 300 270 270 Q 290 300 270 330 Z" fill="#e76f51"/>
-            <path d="M 270 330 Q 250 290 260 280 Q 280 300 275 330 Z" fill="#f4a261"/>
-
-            <!-- Stool -->
-            <rect x="450" y="500" width="100" height="15" fill="#8b4513" rx="5"/>
-            <rect x="460" y="515" width="15" height="90" fill="#6b3410"/>
-            <rect x="525" y="515" width="15" height="90" fill="#6b3410"/>
-
-            <!-- Character (Boy) -->
-            <!-- Legs -->
-            <path d="M 480 500 L 470 600 L 490 600 L 500 500" fill="#2b2b3d"/>
-            <path d="M 510 500 L 520 600 L 540 600 L 530 500" fill="#2b2b3d"/>
-            <!-- Shoes -->
-            <path d="M 460 590 L 495 590 L 495 610 L 460 610 Z" fill="#e0e0e0" rx="5"/>
-            <path d="M 510 590 L 545 590 L 545 610 L 510 610 Z" fill="#e0e0e0" rx="5"/>
-            
-            <!-- Body / Hoodie -->
-            <path d="M 470 300 Q 450 400 470 500 L 540 500 Q 560 400 540 300 Z" fill="#1e5f74"/>
-            <!-- Arms -->
-            <path d="M 470 350 Q 430 400 430 450 L 450 460 Q 460 400 480 380 Z" fill="#1e5f74"/>
-            <path d="M 540 350 Q 570 380 560 420 L 540 430 Q 550 390 530 370 Z" fill="#1e5f74"/>
-            
-            <!-- Hands -->
-            <circle cx="440" cy="450" r="15" fill="#ff9f7f"/>
-            <circle cx="550" cy="420" r="15" fill="#ff9f7f"/>
-
-            <!-- Head and Beanie -->
-            <circle cx="505" cy="250" r="50" fill="#ff9f7f"/>
-            <!-- Beanie -->
-            <path d="M 450 240 Q 450 180 505 170 Q 560 180 560 240 Z" fill="#e04b4b"/>
-            <rect x="450" y="235" width="110" height="15" fill="#c0392b" rx="5"/>
-            <!-- Beanie Brim -->
-            <path d="M 445 240 Q 505 230 565 240 Q 505 250 445 240" fill="#e04b4b"/>
-            <!-- Headphones -->
-            <path d="M 450 250 L 440 290 Q 435 300 445 300 L 455 300 L 460 250" fill="#2b2b3d"/>
-            <path d="M 560 250 L 570 290 Q 575 300 565 300 L 555 300 L 550 250" fill="#2b2b3d"/>
-
-            <!-- Laptop -->
-            <rect x="400" y="370" width="200" height="15" fill="#a9a9a9" rx="5" transform="rotate(-8 500 370)"/>
-            <rect x="410" y="270" width="180" height="105" fill="#d3d3d3" rx="5" transform="rotate(-8 500 370)"/>
-            <rect x="420" y="280" width="160" height="85" fill="#e0e0e0" rx="3" transform="rotate(-8 500 370)"/>
-            
-            <!-- Floor Lamp -->
-            <rect x="780" y="300" width="10" height="300" fill="#5a3520"/>
-            <circle cx="785" cy="600" r="25" fill="#5a3520"/>
-            <path d="M 740 300 Q 785 200 830 300 Z" fill="#ffb347"/>
-            <path d="M 740 300 L 830 300 L 820 280 L 750 280 Z" fill="#ff9900"/>
-            <!-- Lamp Glow -->
-            <circle cx="785" cy="350" r="100" fill="#ffaa00" opacity="0.2"/>
-            <circle cx="785" cy="450" r="150" fill="#ffaa00" opacity="0.1"/>
-
-            <!-- Floating Elements -->
-            <text x="850" y="200" fill="#ffaa00" font-size="30" font-weight="bold">♪</text>
-            <text x="650" y="280" fill="#ff69b4" font-size="25">🦋</text>
-            <rect x="350" y="180" width="60" height="20" fill="#e04b4b" rx="5"/>
-            <text x="360" y="195" fill="white" font-size="12">⚠️ AI</text>
-        </svg>
-
-        <!-- ইনপুট বক্স: এখানে টাইপ করলে ল্যাপটপের স্ক্রিনে লেখা ও ভাসবে -->
-        <textarea id="laptop-screen-input" placeholder="এখানে লিখুন..." autofocus></textarea>
-
-        <!-- Feedback text -->
-        <div style="position: absolute; bottom: 20px; width: 100%; text-align: center; color: #aaa; font-size: 14px; z-index: 100;">
-            ⚡ স্ক্রিনে লেখার জন্য উপরের ডটেড বক্সে টাইপ করুন...
+<div class="chat-wrapper">
+    <!-- Header -->
+    <div class="chat-header">
+        <div class="header-left">
+            <div class="model-name">AI Assistant</div>
+            <div class="online-status">অনলাইন</div>
+        </div>
+        <div class="header-right">
+            <!-- Chat Icon (GPT Style) -->
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 3.42-2.05 4.85-.74.85-1.57 1.5-2.4 1.85.2-.85.8-2.2 1.5-3.35.75-1.25 1.7-2.5 2.95-3.35zm-6.07 3.24c-.55 1.7-1.4 3.6-2.2 4.65-.5-.55-1-1.2-1.35-1.9-.55-1.1-.9-2.5-.9-3.9 0-.5.05-1 .15-1.5.55 1.4 1.75 2.75 3.3 2.75zm-2.4-6.55c1.25-.8 2.9-1.25 4.4-1.25 1.45 0 2.9.4 4.15 1.1-1.7 1.15-3.4 2.65-4.35 4.5-.95 1.85-1.4 3.75-1.55 5.1-.65-.6-1.35-1.4-1.7-2.4-.45-1.25-.55-2.65-.15-4.05.25-.95.7-1.85 1.45-2.55zm7.55 3.15c1.15-1.4 2.65-2.5 4.15-3.05.45.9.75 1.95.75 3.05 0 2.15-.85 4.15-2.3 5.6-.3.3-.65.55-1 .8.1-.85.2-2 .05-3.2-.15-1.35-.55-2.6-1.65-3.2zm-4.7 8.85c.65-1.35 1.1-2.75 1.35-4.15.2-1.2.35-2.5.15-3.65.6-.35 1.25-.55 1.95-.65.85-.15 1.75 0 2.5.35.3.7.45 1.5.45 2.3 0 1.3-.35 2.6-1 3.7-.3.55-.6 1.05-1 1.5-1.3 1.45-3.2 2.35-5.35 2.35-.5 0-1-.05-1.5-.15.5-.55 1.25-1.55 2.25-2.7z"/></svg>
         </div>
     </div>
 
-    <script>
-        const input = document.getElementById('laptop-screen-input');
+    <!-- Chat Area -->
+    <div class="chat-messages" id="chatMessages">
+        <!-- Initial AI Message -->
+        <div class="message-row ai">
+            <div class="avatar ai">🤖</div>
+            <div class="message-text">আসসালামু আলাইকুম! আমি আপনার AI সহকারী। আজকে আমি আপনাকে কীভাবে সাহায্য করতে পারি?</div>
+        </div>
+    </div>
 
-        input.addEventListener('input', (e) => {
-            const text = e.target.value;
-            const lastChar = text[text.length - 1];
+    <!-- Input Area -->
+    <div class="input-area">
+        <div class="input-box-wrapper">
+            <textarea id="userInput" placeholder="Send a message..." rows="1" autofocus></textarea>
+            <button class="send-btn" onclick="sendMessage()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+            </button>
+        </div>
+        <div class="footer-text">AI can make mistakes. Check important info.</div>
+    </div>
+</div>
 
-            if (lastChar && text.length > 0) {
-                // ল্যাপটপের স্ক্রিনের পজিশন বের করা
-                const rect = input.getBoundingClientRect();
+<script>
+    const chatMessages = document.getElementById('chatMessages');
+    const userInput = document.getElementById('userInput');
+    
+    // Textarea-এর উচ্চতা অটো-এডজাস্ট করা (GPT-এর মতো)
+    userInput.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = (this.scrollHeight) + 'px';
+        if(this.value === '') this.style.height = 'auto';
+    });
 
-                // ভাসমান লেখা তৈরি
-                const span = document.createElement('span');
-                span.className = 'float-text';
-                span.innerText = lastChar;
+    // Enter চাপলে সেন্ড, Shift+Enter চাপলে নতুন লাইন
+    userInput.addEventListener('keypress', function (e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
 
-                // ভাসমান লেখার পজিশন ঠিক করা
-                span.style.left = (rect.left + Math.random() * 80 + window.scrollX) + 'px';
-                span.style.top = (rect.top - 20 + window.scrollY) + 'px';
+    function sendMessage() {
+        const text = userInput.value.trim();
+        if (text === "") return;
 
-                document.body.appendChild(span);
+        // ১. ইউজারের মেসেজ যোগ করা (ডান দিকে, Avatar সহ)
+        const userRow = document.createElement('div');
+        userRow.classList.add('message-row', 'user');
+        userRow.innerHTML = `
+            <div class="message-text">${text}</div>
+            <div class="avatar user">👤</div>
+        `;
+        chatMessages.appendChild(userRow);
+        userInput.value = '';
+        userInput.style.height = 'auto';
+        scrollToBottom();
 
-                // ২ সেকেন্ড পর মুছে ফেলা
-                setTimeout(() => {
-                    span.remove();
-                }, 2000);
+        // ২. টাইপিং ইন্ডিকেটর দেখানো (AI বাম দিকে)
+        const typingRow = document.createElement('div');
+        typingRow.classList.add('message-row', 'ai');
+        typingRow.innerHTML = `
+            <div class="avatar ai">🤖</div>
+            <div class="typing-indicator" style="display:flex;">
+                <span></span><span></span><span></span>
+            </div>
+        `;
+        chatMessages.appendChild(typingRow);
+        scrollToBottom();
+
+        // ৩. কিছুক্ষণ পর AI-এর উত্তর (ChatGPT-এর মতো সিমুলেশন)
+        setTimeout(() => {
+            chatMessages.removeChild(typingRow); // টাইপিং ইন্ডিকেটর সরানো
+            
+            let reply = "আপনার প্রশ্নটি খুবই গুরুত্বপূর্ণ। আমি এটি নিয়ে বিশ্লেষণ করছি। আপনি কি আরও নির্দিষ্ট করে বলতে পারবেন কী জানতে চান?";
+            
+            // সাধারণ রেসপন্স লজিক
+            if (text.toLowerCase().includes("ব্যবসা") || text.toLowerCase().includes("বিজনেস")) {
+                reply = "ব্যবসা শুরুর জন্য সবচেয়ে গুরুত্বপূর্ণ হলো একটি ভালো আইডিয়া এবং সঠিক মার্কেট রিসার্চ। আপনি কি স্টার্টআপ শুরু করতে চান, নাকি অনলাইন বিজনেস করতে চান?";
+            } else if (text.includes("হাই") || text.includes("hello") || text.includes("আসসালামু")) {
+                reply = "ওয়ালাইকুম আসসালাম! আমি ভালো আছি, আপনাকে সাহায্য করতে পেরে খুশি। আপনার সমস্যা কী?";
             }
-        });
-    </script>
+
+            // নতুন AI মেসেজ তৈরি করা (বাম দিকে)
+            const aiRow = document.createElement('div');
+            aiRow.classList.add('message-row', 'ai');
+            aiRow.innerHTML = `
+                <div class="avatar ai">🤖</div>
+                <div class="message-text">${reply}</div>
+            `;
+            chatMessages.appendChild(aiRow);
+            scrollToBottom();
+
+        }, 1500); // ১.৫ সেকেন্ড পর উত্তর আসবে
+    }
+
+    function scrollToBottom() {
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+</script>
+
 </body>
 </html>
