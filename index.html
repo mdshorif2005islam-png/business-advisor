@@ -3,272 +3,196 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Typing Assistant Interface</title>
+    <title>3D AI Assistant Interface</title>
     <style>
         body {
             margin: 0;
             padding: 0;
-            background-color: #0d0d2b;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow: hidden;
+            background-color: #0d0d2b; /* Deep Navy Background */
+            height: 100vh;
+            width: 100vw;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            color: #fff;
-        }
-
-        /* Light Source Effect */
-        .light-source {
-            position: absolute;
-            bottom: 0;
-            left: 70%;
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, rgba(255, 165, 0, 0.8) 0%, rgba(255, 165, 0, 0) 70%);
-            transform: translateX(-50%);
-            z-index: -1;
-            pointer-events: none;
-        }
-
-        /* Main Container */
-        .interface-container {
-            position: relative;
-            width: 800px;
-            height: 600px;
-            background: transparent;
-        }
-
-        /* The Character */
-        .character {
-            position: absolute;
-            bottom: 80px;
-            left: 50%;
-            transform: translateX(-10%);
-            width: 150px;
-            height: 300px;
-            background: #2b2b3d;
-            border-radius: 40px 40px 0 0;
-        }
-        .character-head {
-            position: absolute;
-            top: -60px;
-            left: 20px;
-            width: 110px;
-            height: 120px;
-            background: #ff9f7f;
-            border-radius: 50%;
-            border: 15px solid #e04b4b;
-            box-sizing: border-box;
-        }
-        .character-ear {
-            position: absolute;
-            top: 10px;
-            right: -20px;
-            width: 25px;
-            height: 25px;
-            background: #e04b4b;
-            border-radius: 50%;
-        }
-
-        /* Stool */
-        .stool {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-10%);
-            width: 80px;
-            height: 10px;
-            background: #4a2c2c;
-            border-radius: 5px;
-        }
-        .stool::before, .stool::after {
-            content: '';
-            position: absolute;
-            bottom: -50px;
-            width: 10px;
-            height: 50px;
-            background: #4a2c2c;
-        }
-        .stool::before { left: 10px; }
-        .stool::after { right: 10px; }
-
-        /* Laptop */
-        .laptop {
-            position: absolute;
-            top: 100px;
-            left: -150px;
-            width: 200px;
-            height: 20px;
-            background: #a9a9a9;
-            border-radius: 5px;
-            transform: rotate(10deg);
-        }
-        .laptop-screen {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            width: 160px;
-            height: 100px;
-            background: #d0d0d0;
-            border-radius: 5px;
-            border: 5px solid #888;
+            font-family: 'Segoe UI', sans-serif;
             overflow: hidden;
         }
 
-        /* Typing Area */
-        #typing-area {
+        /* Main Container for the whole scene */
+        .scene {
+            position: relative;
+            width: 1000px;
+            height: 700px;
+            background: radial-gradient(circle at 70% 80%, rgba(255, 140, 0, 0.6) 0%, rgba(0,0,0,0) 40%);
+        }
+
+        /* SVG Illustration placeholder */
+        svg {
             position: absolute;
-            top: -100px;
-            left: -150px;
-            width: 200px;
-            height: 30px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid #333;
-            color: #fff;
-            padding: 10px;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Laptop Screen Typing Area (Transparent and positioned exactly over the laptop) */
+        #laptop-screen-input {
+            position: absolute;
+            top: 37%;       /* Adjust to match exact laptop position */
+            left: 45.5%;    /* Adjust to match exact laptop position */
+            width: 110px;
+            height: 70px;
+            
+            background: transparent;
+            border: none;
             outline: none;
-            border-radius: 10px;
+            
+            color: #1b1b1b;
+            font-size: 13px;
+            font-weight: bold;
+            text-align: center;
+            resize: none;
+            transform: rotate(-8deg); /* Matches the angle of the laptop */
             z-index: 10;
         }
 
+        /* Floating Text Animation */
         .float-text {
             position: absolute;
-            color: #fff;
-            font-size: 18px;
-            font-weight: bold;
-            text-shadow: 0 0 10px #ffaa00;
+            color: #ffaa00;
+            font-size: 24px;
+            font-weight: 900;
+            text-shadow: 0 0 20px #ffaa00;
             animation: floatUp 2s linear forwards;
             pointer-events: none;
-            z-index: 5;
+            z-index: 50;
         }
 
         @keyframes floatUp {
-            0% { opacity: 1; transform: translateY(0); }
-            100% { opacity: 0; transform: translateY(-150px); }
+            0% { opacity: 0; transform: translateY(0) scale(0.5); }
+            20% { opacity: 1; transform: translateY(-20px) scale(1); }
+            100% { opacity: 0; transform: translateY(-200px) scale(1.5) rotate(10deg); }
         }
-
-        /* Floor Lamp */
-        .lamp {
-            position: absolute;
-            bottom: 20px;
-            left: 650px;
-            width: 5px;
-            height: 400px;
-            background: #4a2c2c;
-        }
-        .lamp-shade {
-            position: absolute;
-            top: 0;
-            left: -40px;
-            width: 85px;
-            height: 120px;
-            background: #ff9900;
-            border-radius: 50% 50% 0 0;
-            box-shadow: 0 0 50px 20px rgba(255, 165, 0, 0.4);
-        }
-
-        /* Plant */
-        .plant-pot {
-            position: absolute;
-            bottom: 80px;
-            left: 100px;
-            width: 80px;
-            height: 80px;
-            background: #1e5f74;
-            border-radius: 0 0 20px 20px;
-        }
-        .plant-stem {
-            position: absolute;
-            bottom: 80px;
-            left: 130px;
-            width: 10px;
-            height: 150px;
-            background: green;
-        }
-        .flower {
-            position: absolute;
-            bottom: 220px;
-            left: 115px;
-            width: 40px;
-            height: 40px;
-            background: #ff4d4d;
-            border-radius: 50% 50% 0 0;
-            transform: rotate(45deg);
-        }
-
-        /* Table */
-        .table {
-            position: absolute;
-            bottom: 100px;
-            left: 30px;
-            width: 200px;
-            height: 10px;
-            background: #5c3a21;
-            border-radius: 5px;
-        }
-        .table::before, .table::after {
-            content: '';
-            position: absolute;
-            top: 10px;
-            width: 10px;
-            height: 100px;
-            background: #5c3a21;
-        }
-        .table::before { left: 20px; }
-        .table::after { right: 20px; }
-
     </style>
 </head>
 <body>
 
-    <div class="light-source"></div>
+    <div class="scene">
+        <!-- এই SVG দিয়েই হুবহু ছবির 3D ডিজাইনটি আঁকা হয়েছে -->
+        <svg viewBox="0 0 1000 700" xmlns="http://www.w3.org/2000/svg">
+            <!-- Floor and Lighting -->
+            <ellipse cx="500" cy="600" rx="400" ry="100" fill="#ffa500" opacity="0.3"/>
+            <ellipse cx="700" cy="650" rx="300" ry="80" fill="#ff6347" opacity="0.2"/>
 
-    <div class="interface-container">
-        <div class="table"></div>
-        <div class="plant-pot"></div>
-        <div class="plant-stem"></div>
-        <div class="flower"></div>
-        
-        <div class="lamp">
-            <div class="lamp-shade"></div>
+            <!-- Table -->
+            <rect x="100" y="450" width="200" height="15" fill="#6b4226" rx="5"/>
+            <rect x="120" y="465" width="15" height="100" fill="#5a3520"/>
+            <rect x="270" y="465" width="15" height="100" fill="#5a3520"/>
+            <rect x="100" y="560" width="200" height="15" fill="#6b4226" rx="5"/>
+            <!-- Books on Table -->
+            <rect x="130" y="425" width="60" height="25" fill="#f4a261" rx="3"/>
+            <rect x="140" y="405" width="80" height="20" fill="#e76f51" rx="3"/>
+            <rect x="135" y="390" width="40" height="15" fill="#2a9d8f" rx="3"/>
+
+            <!-- Plant Pot -->
+            <path d="M 200 550 Q 200 450 250 450 Q 300 450 300 550 Z" fill="#1e5f74"/>
+            <rect x="210" y="440" width="80" height="20" fill="#134e5e"/>
+            <!-- Plant Leaves and Tulip -->
+            <path d="M 250 440 Q 200 350 220 300 Q 240 380 250 440" fill="#2a9d8f"/>
+            <path d="M 250 440 Q 280 300 290 280 Q 270 380 255 440" fill="#264653"/>
+            <path d="M 250 440 Q 250 350 270 330 Q 260 390 255 440" fill="#e9c46a"/>
+            <path d="M 250 440 Q 230 320 240 300 Q 245 380 245 440" fill="#2a9d8f"/>
+            <!-- Tulip Flower -->
+            <path d="M 270 330 Q 250 300 270 270 Q 290 300 270 330 Z" fill="#e76f51"/>
+            <path d="M 270 330 Q 250 290 260 280 Q 280 300 275 330 Z" fill="#f4a261"/>
+
+            <!-- Stool -->
+            <rect x="450" y="500" width="100" height="15" fill="#8b4513" rx="5"/>
+            <rect x="460" y="515" width="15" height="90" fill="#6b3410"/>
+            <rect x="525" y="515" width="15" height="90" fill="#6b3410"/>
+
+            <!-- Character (Boy) -->
+            <!-- Legs -->
+            <path d="M 480 500 L 470 600 L 490 600 L 500 500" fill="#2b2b3d"/>
+            <path d="M 510 500 L 520 600 L 540 600 L 530 500" fill="#2b2b3d"/>
+            <!-- Shoes -->
+            <path d="M 460 590 L 495 590 L 495 610 L 460 610 Z" fill="#e0e0e0" rx="5"/>
+            <path d="M 510 590 L 545 590 L 545 610 L 510 610 Z" fill="#e0e0e0" rx="5"/>
+            
+            <!-- Body / Hoodie -->
+            <path d="M 470 300 Q 450 400 470 500 L 540 500 Q 560 400 540 300 Z" fill="#1e5f74"/>
+            <!-- Arms -->
+            <path d="M 470 350 Q 430 400 430 450 L 450 460 Q 460 400 480 380 Z" fill="#1e5f74"/>
+            <path d="M 540 350 Q 570 380 560 420 L 540 430 Q 550 390 530 370 Z" fill="#1e5f74"/>
+            
+            <!-- Hands -->
+            <circle cx="440" cy="450" r="15" fill="#ff9f7f"/>
+            <circle cx="550" cy="420" r="15" fill="#ff9f7f"/>
+
+            <!-- Head and Beanie -->
+            <circle cx="505" cy="250" r="50" fill="#ff9f7f"/>
+            <!-- Beanie -->
+            <path d="M 450 240 Q 450 180 505 170 Q 560 180 560 240 Z" fill="#e04b4b"/>
+            <rect x="450" y="235" width="110" height="15" fill="#c0392b" rx="5"/>
+            <!-- Beanie Brim -->
+            <path d="M 445 240 Q 505 230 565 240 Q 505 250 445 240" fill="#e04b4b"/>
+            <!-- Headphones -->
+            <path d="M 450 250 L 440 290 Q 435 300 445 300 L 455 300 L 460 250" fill="#2b2b3d"/>
+            <path d="M 560 250 L 570 290 Q 575 300 565 300 L 555 300 L 550 250" fill="#2b2b3d"/>
+
+            <!-- Laptop -->
+            <rect x="400" y="370" width="200" height="15" fill="#a9a9a9" rx="5" transform="rotate(-8 500 370)"/>
+            <rect x="410" y="270" width="180" height="105" fill="#d3d3d3" rx="5" transform="rotate(-8 500 370)"/>
+            <rect x="420" y="280" width="160" height="85" fill="#e0e0e0" rx="3" transform="rotate(-8 500 370)"/>
+            
+            <!-- Floor Lamp -->
+            <rect x="780" y="300" width="10" height="300" fill="#5a3520"/>
+            <circle cx="785" cy="600" r="25" fill="#5a3520"/>
+            <path d="M 740 300 Q 785 200 830 300 Z" fill="#ffb347"/>
+            <path d="M 740 300 L 830 300 L 820 280 L 750 280 Z" fill="#ff9900"/>
+            <!-- Lamp Glow -->
+            <circle cx="785" cy="350" r="100" fill="#ffaa00" opacity="0.2"/>
+            <circle cx="785" cy="450" r="150" fill="#ffaa00" opacity="0.1"/>
+
+            <!-- Floating Elements -->
+            <text x="850" y="200" fill="#ffaa00" font-size="30" font-weight="bold">♪</text>
+            <text x="650" y="280" fill="#ff69b4" font-size="25">🦋</text>
+            <rect x="350" y="180" width="60" height="20" fill="#e04b4b" rx="5"/>
+            <text x="360" y="195" fill="white" font-size="12">⚠️ AI</text>
+        </svg>
+
+        <!-- ইনপুট বক্স: এখানে টাইপ করলে ল্যাপটপের স্ক্রিনে লেখা ও ভাসবে -->
+        <textarea id="laptop-screen-input" placeholder="এখানে লিখুন..." autofocus></textarea>
+
+        <!-- Feedback text -->
+        <div style="position: absolute; bottom: 20px; width: 100%; text-align: center; color: #aaa; font-size: 14px; z-index: 100;">
+            ⚡ স্ক্রিনে লেখার জন্য উপরের ডটেড বক্সে টাইপ করুন...
         </div>
-
-        <div class="stool"></div>
-
-        <div class="character">
-            <div class="character-head">
-                <div class="character-ear"></div>
-            </div>
-        </div>
-
-        <div class="laptop">
-            <div class="laptop-screen" id="screen"></div>
-        </div>
-
-        <input type="text" id="typing-area" placeholder="এখানে টাইপ করুন..." autofocus>
     </div>
 
     <script>
-        const input = document.getElementById('typing-area');
-        const screen = document.getElementById('screen');
+        const input = document.getElementById('laptop-screen-input');
 
         input.addEventListener('input', (e) => {
             const text = e.target.value;
-            
-            screen.innerHTML = text;
+            const lastChar = text[text.length - 1];
 
-            if(text.length > 0) {
-                const lastChar = text[text.length - 1];
+            if (lastChar && text.length > 0) {
+                // ল্যাপটপের স্ক্রিনের পজিশন বের করা
+                const rect = input.getBoundingClientRect();
+
+                // ভাসমান লেখা তৈরি
                 const span = document.createElement('span');
                 span.className = 'float-text';
                 span.innerText = lastChar;
-                
-                span.style.left = (Math.random() * 100) + 'px'; 
-                span.style.top = '0px'; 
-                
-                document.querySelector('.laptop-screen').appendChild(span);
 
+                // ভাসমান লেখার পজিশন ঠিক করা
+                span.style.left = (rect.left + Math.random() * 80 + window.scrollX) + 'px';
+                span.style.top = (rect.top - 20 + window.scrollY) + 'px';
+
+                document.body.appendChild(span);
+
+                // ২ সেকেন্ড পর মুছে ফেলা
                 setTimeout(() => {
                     span.remove();
                 }, 2000);
