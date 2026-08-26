@@ -1,91 +1,287 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>বিজনেস উপদেষ্টা — শোরিফ AI</title>
-    <link rel="stylesheet" href="style.css">
+    <title>AI Typing Assistant Interface</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #0d0d2b; /* Dark blue background like the image */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #fff;
+        }
+
+        /* Light Source Effect */
+        .light-source {
+            position: absolute;
+            bottom: 0;
+            left: 70%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(255, 165, 0, 0.8) 0%, rgba(255, 165, 0, 0) 70%);
+            transform: translateX(-50%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Main Container */
+        .interface-container {
+            position: relative;
+            width: 800px;
+            height: 600px;
+            background: transparent;
+        }
+
+        /* The Character (Stylized using CSS) */
+        .character {
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-10%);
+            width: 150px;
+            height: 300px;
+            background: #2b2b3d; /* Dark clothes */
+            border-radius: 40px 40px 0 0;
+        }
+        .character-head {
+            position: absolute;
+            top: -60px;
+            left: 20px;
+            width: 110px;
+            height: 120px;
+            background: #ff9f7f; /* Skin tone */
+            border-radius: 50%;
+            border: 15px solid #e04b4b; /* Red beanie */
+            box-sizing: border-box;
+        }
+        .character-ear {
+            position: absolute;
+            top: 10px;
+            right: -20px;
+            width: 25px;
+            height: 25px;
+            background: #e04b4b;
+            border-radius: 50%;
+        }
+
+        /* Stool */
+        .stool {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-10%);
+            width: 80px;
+            height: 10px;
+            background: #4a2c2c;
+            border-radius: 5px;
+        }
+        .stool::before, .stool::after {
+            content: '';
+            position: absolute;
+            bottom: -50px;
+            width: 10px;
+            height: 50px;
+            background: #4a2c2c;
+        }
+        .stool::before { left: 10px; }
+        .stool::after { right: 10px; }
+
+        /* Laptop */
+        .laptop {
+            position: absolute;
+            top: 100px;
+            left: -150px;
+            width: 200px;
+            height: 20px;
+            background: #a9a9a9;
+            border-radius: 5px;
+            transform: rotate(10deg);
+        }
+        .laptop-screen {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            width: 160px;
+            height: 100px;
+            background: #d0d0d0;
+            border-radius: 5px;
+            border: 5px solid #888;
+        }
+
+        /* Text Floating Animation (The core requirement) */
+        #typing-area {
+            position: absolute;
+            top: -100px;
+            left: -150px;
+            width: 200px;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid #333;
+            color: #fff;
+            padding: 10px;
+            outline: none;
+            border-radius: 10px;
+            z-index: 10;
+        }
+
+        .float-text {
+            position: absolute;
+            color: #fff;
+            font-size: 18px;
+            font-weight: bold;
+            text-shadow: 0 0 10px #ffaa00;
+            animation: floatUp 2s linear forwards;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-150px); }
+        }
+
+        /* Floor Lamp */
+        .lamp {
+            position: absolute;
+            bottom: 20px;
+            left: 650px;
+            width: 5px;
+            height: 400px;
+            background: #4a2c2c;
+        }
+        .lamp-shade {
+            position: absolute;
+            top: 0;
+            left: -40px;
+            width: 85px;
+            height: 120px;
+            background: #ff9900;
+            border-radius: 50% 50% 0 0;
+            box-shadow: 0 0 50px 20px rgba(255, 165, 0, 0.4);
+        }
+
+        /* Plant (Like the Tulip in the image) */
+        .plant-pot {
+            position: absolute;
+            bottom: 80px;
+            left: 100px;
+            width: 80px;
+            height: 80px;
+            background: #1e5f74;
+            border-radius: 0 0 20px 20px;
+        }
+        .plant-stem {
+            position: absolute;
+            bottom: 80px;
+            left: 130px;
+            width: 10px;
+            height: 150px;
+            background: green;
+        }
+        .flower {
+            position: absolute;
+            bottom: 220px;
+            left: 115px;
+            width: 40px;
+            height: 40px;
+            background: #ff4d4d;
+            border-radius: 50% 50% 0 0;
+            transform: rotate(45deg);
+        }
+
+        /* Table */
+        .table {
+            position: absolute;
+            bottom: 100px;
+            left: 30px;
+            width: 200px;
+            height: 10px;
+            background: #5c3a21;
+            border-radius: 5px;
+        }
+        .table::before, .table::after {
+            content: '';
+            position: absolute;
+            top: 10px;
+            width: 10px;
+            height: 100px;
+            background: #5c3a21;
+        }
+        .table::before { left: 20px; }
+        .table::after { right: 20px; }
+
+    </style>
 </head>
 <body>
-    <div class="container">
 
-        <!-- ============================================ -->
-        <!-- লক স্ক্রিন (পাসওয়ার্ড ইনপুট) -->
-        <!-- ============================================ -->
-        <div id="lockScreen" class="lock-screen">
-            <div class="lock-box">
-                <div class="lock-icon">🔐</div>
-                <h2>প্রবেশ করতে কোড দিন</h2>
-                <p class="lock-sub">এই টুলটি শুধুমাত্র অনুমোদিত ব্যক্তিদের জন্য</p>
-                <input type="password" id="passwordInput" placeholder="আপনার কোড লিখুন...">
-                <button id="unlockBtn">🔓 প্রবেশ করুন</button>
-                <div id="lockError" class="lock-error"></div>
+    <div class="light-source"></div>
+
+    <div class="interface-container">
+        <!-- Background Elements -->
+        <div class="table"></div>
+        <div class="plant-pot"></div>
+        <div class="plant-stem"></div>
+        <div class="flower"></div>
+        
+        <div class="lamp">
+            <div class="lamp-shade"></div>
+        </div>
+
+        <div class="stool"></div>
+
+        <!-- AI Assistant Character -->
+        <div class="character">
+            <div class="character-head">
+                <div class="character-ear"></div>
             </div>
         </div>
 
-        <!-- ============================================ -->
-        <!-- মূল কন্টেন্ট (পাসওয়ার্ড দিলেই দেখাবে) -->
-        <!-- ============================================ -->
-        <div id="mainContent" class="main-content" style="display: none;">
-
-            <!-- হেডার - উপদেষ্টার পরিচয় -->
-            <header>
-                <div class="advisor-profile">
-                    <div class="avatar">👨‍💼</div>
-                    <div>
-                        <h1>শোরিফ — আপনার বিজনেস উপদেষ্টা</h1>
-                        <p class="tagline">"স্যার, আপনার ব্যবসায়িক যেকোনো প্রশ্নের উত্তর পেতে জিজ্ঞেস করুন"</p>
-                    </div>
-                </div>
-            </header>
-
-            <!-- চ্যাট ইন্টারফেস -->
-            <div class="chat-section">
-                <div class="chat-box" id="chatBox">
-                    <div class="advisor-msg">
-                        👋 আসসালামু আলাইকুম, স্যার!<br>
-                        আমি শোরিফ, আপনার ব্যক্তিগত বিজনেস উপদেষ্টা।<br>
-                        কীভাবে সাহায্য করতে পারি? নিচের অপশন থেকে বেছে নিন অথবা সরাসরি প্রশ্ন লিখুন।
-                    </div>
-                </div>
-                <div class="input-area">
-                    <input type="text" id="userInput" placeholder="আপনার প্রশ্ন লিখুন, স্যার...">
-                    <button id="sendBtn">📤 পাঠান</button>
-                </div>
-            </div>
-
-            <!-- কুইক অ্যাকশন -->
-            <div class="quick-actions">
-                <button class="action" data-action="idea">💡 ব্যবসার আইডিয়া</button>
-                <button class="action" data-action="profit">💰 লাভ-ক্ষতি বিশ্লেষণ</button>
-                <button class="action" data-action="market">📊 মার্কেট রিসার্চ</button>
-                <button class="action" data-action="invest">🏦 বিনিয়োগ পরামর্শ</button>
-                <button class="action" data-action="document">📄 ডকুমেন্ট প্রস্তাব</button>
-            </div>
-
-            <!-- দ্রুত প্রশ্ন -->
-            <div class="quick-questions">
-                <p class="hint">স্যার, আপনি জিজ্ঞেস করতে পারেন:</p>
-                <div class="question-chips">
-                    <span class="chip" data-question="আমার ব্যবসার জন্য কোন আইডিয়া ভালো?">💭 ব্যবসার আইডিয়া</span>
-                    <span class="chip" data-question="আমি কীভাবে লাভ বাড়াতে পারি?">📈 লাভ বাড়ানোর উপায়</span>
-                    <span class="chip" data-question="কম বাজেটে কী ব্যবসা শুরু করব?">💰 কম বাজেটের ব্যবসা</span>
-                    <span class="chip" data-question="মার্কেটিং কীভাবে করব?">📣 মার্কেটিং টিপস</span>
-                </div>
-            </div>
-
-            <!-- ফুটার -->
-            <footer>
-                <p>🆓 আপনার ব্যক্তিগত বিজনেস উপদেষ্টা — ২৪/৭ সেবায়</p>
-            </footer>
-
+        <!-- Laptop -->
+        <div class="laptop">
+            <div class="laptop-screen" id="screen"></div>
         </div>
-        <!-- ============================================ -->
-        <!-- মূল কন্টেন্ট শেষ -->
-        <!-- ============================================ -->
 
+        <!-- Typing Input Area (Where the user types) -->
+        <input type="text" id="typing-area" placeholder="Type here to see magic..." autofocus>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+        const input = document.getElementById('typing-area');
+        const screen = document.getElementById('screen');
+
+        // Event listener for typing
+        input.addEventListener('input', (e) => {
+            const text = e.target.value;
+            
+            // Show text on the laptop screen
+            screen.innerHTML = text;
+
+            // Create floating text effect (Ashbe j hatnariye, silekha screen e vasbe)
+            if(text.length > 0) {
+                const lastChar = text[text.length - 1];
+                const span = document.createElement('span');
+                span.className = 'float-text';
+                span.innerText = lastChar;
+                
+                // Position the floating text above the laptop
+                span.style.left = (Math.random() * 100) + 'px'; // Random horizontal position
+                span.style.top = '0px'; 
+                
+                document.querySelector('.laptop-screen').appendChild(span);
+
+                // Remove the text after animation completes
+                setTimeout(() => {
+                    span.remove();
+                }, 2000);
+            }
+        });
+    </script>
 </body>
-</html>
+</html>s
