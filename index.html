@@ -3,339 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Assistant - OpenAI API</title>
-    <style>
-        /* ChatGPT-এর মতো স্টাইল */
-        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600&family=Hind+Siliguri:wght@400;500;700&display=swap');
-
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-
-        body {
-            font-family: 'Hind Siliguri', 'Sora', sans-serif;
-            background: #ffffff;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .chat-wrapper {
-            width: 100%;
-            max-width: 768px;
-            height: 100vh;
-            background: #ffffff;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 0 20px rgba(0,0,0,0.05);
-        }
-
-        /* Header */
-        .chat-header {
-            padding: 15px 20px;
-            border-bottom: 1px solid #e5e5e5;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: #ffffff;
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .model-name {
-            font-size: 18px;
-            font-weight: 600;
-            color: #202123;
-        }
-
-        .online-status {
-            font-size: 12px;
-            color: #10a37f;
-            background: #e6f4f1;
-            padding: 2px 8px;
-            border-radius: 10px;
-        }
-
-        /* Chat Area */
-        .chat-messages {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
-            background: #ffffff;
-        }
-
-        .message-row {
-            display: flex;
-            align-items: flex-start;
-            gap: 15px;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .message-row.user { justify-content: flex-end; }
-        .message-row.ai { justify-content: flex-start; }
-
-        .avatar {
-            width: 30px;
-            height: 30px;
-            border-radius: 2px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .avatar.ai {
-            background: #10a37f;
-            color: white;
-            font-size: 16px;
-        }
-
-        .avatar.user {
-            background: #5436da;
-            color: white;
-            font-size: 16px;
-        }
-
-        .message-text {
-            max-width: 100%;
-            font-size: 16px;
-            line-height: 1.7;
-            color: #374151;
-            padding-top: 4px;
-            white-space: pre-wrap;
-        }
-
-        .user .message-text {
-            background: #f4f4f4;
-            padding: 10px 15px;
-            border-radius: 8px;
-            color: #202123;
-        }
-
-        /* Typing Indicator */
-        .typing-indicator {
-            display: none;
-            align-items: center;
-            gap: 5px;
-            padding-top: 5px;
-        }
-
-        .typing-indicator span {
-            width: 8px;
-            height: 8px;
-            background: #10a37f;
-            border-radius: 50%;
-            display: inline-block;
-            animation: bounce 1.4s infinite ease-in-out both;
-        }
-
-        .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
-        .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
-
-        @keyframes bounce {
-            0%, 80%, 100% { transform: translateY(0); opacity: 0.5; }
-            40% { transform: translateY(-5px); opacity: 1; }
-        }
-
-        /* Input Area */
-        .input-area {
-            background: #ffffff;
-            padding: 20px 20px 30px 20px;
-            border-top: 1px solid #e5e5e5;
-        }
-
-        .input-box-wrapper {
-            position: relative;
-            max-width: 768px;
-            margin: 0 auto;
-            border: 1px solid #d1d5db;
-            border-radius: 12px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.05);
-            background: #ffffff;
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
-
-        .input-box-wrapper:focus-within {
-            border-color: #10a37f;
-            box-shadow: 0 0 0 3px rgba(16, 163, 127, 0.1);
-        }
-
-        textarea {
-            width: 100%;
-            padding: 14px 50px 14px 15px;
-            border: none;
-            outline: none;
-            background: transparent;
-            font-family: inherit;
-            font-size: 16px;
-            line-height: 1.5;
-            resize: none;
-            max-height: 200px;
-            color: #202123;
-        }
-
-        textarea::placeholder { color: #9ca3af; }
-
-        .send-btn {
-            position: absolute;
-            right: 10px;
-            bottom: 10px;
-            background: #10a37f;
-            color: white;
-            border: none;
-            width: 32px;
-            height: 32px;
-            border-radius: 6px;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: background 0.2s;
-        }
-
-        .send-btn:hover { background: #0d8a6a; }
-
-        .footer-text {
-            text-align: center;
-            font-size: 12px;
-            color: #9ca3af;
-            padding: 5px 0 15px 0;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-    </style>
+    <title>টাস্ক ম্যানেজার</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="chat-wrapper">
-    <div class="chat-header">
-        <div class="header-left">
-            <div class="model-name">AI Assistant</div>
-            <div class="online-status">OpenAI সংযুক্ত</div>
+    <div class="container">
+        <!-- হেডার -->
+        <header>
+            <h1>📋 টাস্ক ম্যানেজার</h1>
+            <p>আজকের কাজগুলো সংগঠিত করুন</p>
+        </header>
+
+        <!-- টাস্ক ইনপুট ফর্ম -->
+        <div class="task-form">
+            <input type="text" id="taskInput" placeholder="নতুন টাস্ক লিখুন...">
+            <input type="date" id="taskDate">
+            <select id="taskCategory">
+                <option value="ব্যক্তিগত">🧑 ব্যক্তিগত</option>
+                <option value="অফিস">💼 অফিস</option>
+                <option value="শিক্ষা">📚 শিক্ষা</option>
+                <option value="স্বাস্থ্য">🏃 স্বাস্থ্য</option>
+            </select>
+            <button id="addTaskBtn">➕ টাস্ক যোগ করুন</button>
+        </div>
+
+        <!-- ফিল্টার ও সার্চ -->
+        <div class="filter-section">
+            <select id="filterCategory">
+                <option value="সব">📂 সব</option>
+                <option value="ব্যক্তিগত">🧑 ব্যক্তিগত</option>
+                <option value="অফিস">💼 অফিস</option>
+                <option value="শিক্ষা">📚 শিক্ষা</option>
+                <option value="স্বাস্থ্য">🏃 স্বাস্থ্য</option>
+            </select>
+            <input type="text" id="searchInput" placeholder="🔍 টাস্ক খুঁজুন...">
+            <button id="clearAllBtn">🗑️ সব ডিলিট</button>
+        </div>
+
+        <!-- টাস্ক লিস্ট -->
+        <div id="taskList" class="task-list">
+            <!-- টাস্ক এখানে ডায়নামিকভাবে দেখাবে -->
+        </div>
+
+        <!-- টাস্ক কাউন্ট -->
+        <div class="task-stats">
+            <span>📊 মোট: <span id="totalTasks">0</span></span>
+            <span>✅ সম্পন্ন: <span id="completedTasks">0</span></span>
+            <span>⏳ বাকি: <span id="pendingTasks">0</span></span>
         </div>
     </div>
 
-    <div class="chat-messages" id="chatMessages">
-        <div class="message-row ai">
-            <div class="avatar ai">🤖</div>
-            <div class="message-text">আসসালামু আলাইকুম! আমি আপনার AI সহকারী। আজকে আমি আপনাকে কীভাবে সাহায্য করতে পারি?</div>
-        </div>
-    </div>
-
-    <div class="input-area">
-        <div class="input-box-wrapper">
-            <textarea id="userInput" placeholder="Send a message..." rows="1" autofocus></textarea>
-            <button class="send-btn" onclick="sendMessage()">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-            </button>
-        </div>
-        <div class="footer-text">AI can make mistakes. Check important info.</div>
-    </div>
-</div>
-
-<script>
-    const chatMessages = document.getElementById('chatMessages');
-    const userInput = document.getElementById('userInput');
-    
-    // ⚠️ এখানে আপনার আসল API Key বসান
-    const API_KEY = "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"; 
-
-    userInput.addEventListener('input', function() {
-        this.style.height = 'auto';
-        this.style.height = (this.scrollHeight) + 'px';
-        if(this.value === '') this.style.height = 'auto';
-    });
-
-    userInput.addEventListener('keypress', function (e) {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            sendMessage();
-        }
-    });
-
-    async function sendMessage() {
-        const text = userInput.value.trim();
-        if (text === "") return;
-
-        // 1. User Message
-        const userRow = document.createElement('div');
-        userRow.classList.add('message-row', 'user');
-        userRow.innerHTML = `
-            <div class="message-text">${text}</div>
-            <div class="avatar user">👤</div>
-        `;
-        chatMessages.appendChild(userRow);
-        userInput.value = '';
-        userInput.style.height = 'auto';
-        scrollToBottom();
-
-        // 2. Typing Indicator
-        const typingRow = document.createElement('div');
-        typingRow.classList.add('message-row', 'ai');
-        typingRow.innerHTML = `
-            <div class="avatar ai">🤖</div>
-            <div class="typing-indicator" style="display:flex;">
-                <span></span><span></span><span></span>
-            </div>
-        `;
-        chatMessages.appendChild(typingRow);
-        scrollToBottom();
-
-        try {
-            // 3. OpenAI API Call
-            const response = await fetch('https://api.openai.com/v1/chat/completions', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${API_KEY}`
-                },
-                body: JSON.stringify({
-                    model: "gpt-3.5-turbo", // অথবা gpt-4o ব্যবহার করতে পারেন
-                    messages: [
-                        { role: "system", content: "You are a helpful assistant in Bengali." },
-                        { role: "user", content: text }
-                    ],
-                    temperature: 0.7
-                })
-            });
-
-            const data = await response.json();
-
-            // Remove typing indicator
-            chatMessages.removeChild(typingRow);
-
-            // 4. Show AI Reply
-            const aiRow = document.createElement('div');
-            aiRow.classList.add('message-row', 'ai');
-            aiRow.innerHTML = `
-                <div class="avatar ai">🤖</div>
-                <div class="message-text">${data.choices[0].message.content}</div>
-            `;
-            chatMessages.appendChild(aiRow);
-            scrollToBottom();
-
-        } catch (error) {
-            chatMessages.removeChild(typingRow);
-            const errorRow = document.createElement('div');
-            errorRow.classList.add('message-row', 'ai');
-            errorRow.innerHTML = `<div class="avatar ai">🤖</div><div class="message-text" style="color:red;">দুঃখিত, API তে সমস্যা হচ্ছে। Localhost সার্ভার থেকে চালাচ্ছেন তো?</div>`;
-            chatMessages.appendChild(errorRow);
-            console.error("Error:", error);
-        }
-    }
-
-    function scrollToBottom() {
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-</script>
-
+    <script src="script.js"></script>
 </body>
 </html>

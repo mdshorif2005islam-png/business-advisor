@@ -1,4 +1,6 @@
-/* রিসেট ও বেসিক */
+/* ============================================
+   বেসিক রিসেট
+   ============================================ */
 * {
     margin: 0;
     padding: 0;
@@ -7,7 +9,7 @@
 }
 
 body {
-    background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+    background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
     min-height: 100vh;
     display: flex;
     justify-content: center;
@@ -16,310 +18,300 @@ body {
 }
 
 .container {
-    max-width: 850px;
+    max-width: 900px;
     width: 100%;
-    background: rgba(255, 255, 255, 0.97);
+    background: rgba(255, 255, 255, 0.96);
     border-radius: 30px;
     padding: 30px;
     box-shadow: 0 25px 70px rgba(0,0,0,0.6);
-    position: relative;
-    min-height: 500px;
 }
 
-/* ==========================================
-   লক স্ক্রিন স্টাইল
-   ========================================== */
-.lock-screen {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 500px;
-    width: 100%;
-    background: rgba(255,255,255,0.98);
-    border-radius: 30px;
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 100;
-    padding: 30px;
-}
-
-.lock-box {
-    text-align: center;
-    max-width: 400px;
-    width: 100%;
-}
-
-.lock-icon {
-    font-size: 4rem;
-    margin-bottom: 15px;
-}
-
-.lock-box h2 {
-    font-size: 1.8rem;
-    color: #2c3e50;
-    margin-bottom: 8px;
-}
-
-.lock-sub {
-    color: #7f8c8d;
-    margin-bottom: 25px;
-    font-size: 0.95rem;
-}
-
-.lock-box input {
-    width: 100%;
-    padding: 14px 18px;
-    border-radius: 50px;
-    border: 2px solid #ddd;
-    font-size: 1rem;
-    margin-bottom: 12px;
-    transition: 0.3s;
-    text-align: center;
-}
-
-.lock-box input:focus {
-    border-color: #3498db;
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(52,152,219,0.2);
-}
-
-.lock-box button {
-    width: 100%;
-    padding: 14px;
-    background: #2c3e50;
-    color: white;
-    border: none;
-    border-radius: 50px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: 0.3s;
-}
-
-.lock-box button:hover {
-    background: #34495e;
-    transform: scale(1.02);
-}
-
-.lock-error {
-    color: #e74c3c;
-    margin-top: 12px;
-    font-weight: 500;
-    min-height: 30px;
-}
-
-/* ==========================================
-   মূল কন্টেন্ট স্টাইল (আগের মতো)
-   ========================================== */
-.main-content {
-    animation: fadeIn 0.6s ease;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* হেডার */
+/* ============================================
+   হেডার
+   ============================================ */
 header {
-    background: linear-gradient(135deg, #2c3e50, #34495e);
-    border-radius: 20px;
-    padding: 20px 25px;
-    margin-bottom: 20px;
-    color: white;
-}
-
-.advisor-profile {
-    display: flex;
-    align-items: center;
-    gap: 18px;
-}
-
-.avatar {
-    font-size: 3.5rem;
-    background: #f39c12;
-    width: 70px;
-    height: 70px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 3px solid white;
-    flex-shrink: 0;
+    text-align: center;
+    margin-bottom: 25px;
 }
 
 header h1 {
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin-bottom: 5px;
+    font-size: 2.2rem;
+    color: #2c3e50;
 }
 
-.tagline {
-    font-size: 0.95rem;
-    opacity: 0.9;
-    font-style: italic;
-    color: #f1c40f;
+header p {
+    color: #7f8c8d;
+    font-size: 1rem;
 }
 
-/* চ্যাট */
-.chat-section {
-    margin-bottom: 15px;
-}
-
-.chat-box {
-    background: #f0f2f5;
-    border-radius: 18px;
-    padding: 20px;
-    min-height: 150px;
-    max-height: 300px;
-    overflow-y: auto;
-    margin-bottom: 12px;
-    border: 1px solid #ddd;
-}
-
-.advisor-msg {
-    background: #2c3e50;
-    color: white;
-    padding: 15px 20px;
-    border-radius: 18px 18px 18px 5px;
-    max-width: 85%;
-    line-height: 1.8;
-    margin-bottom: 10px;
-    font-size: 0.98rem;
-}
-
-.user-msg {
-    background: #3498db;
-    color: white;
-    padding: 12px 18px;
-    border-radius: 18px 18px 5px 18px;
-    max-width: 85%;
-    margin-left: auto;
-    margin-bottom: 10px;
-    line-height: 1.6;
-}
-
-.input-area {
+/* ============================================
+   টাস্ক ফর্ম
+   ============================================ */
+.task-form {
     display: flex;
+    flex-wrap: wrap;
     gap: 10px;
+    margin-bottom: 20px;
 }
 
-.input-area input {
-    flex: 1;
-    padding: 14px 18px;
+.task-form input,
+.task-form select,
+.task-form button {
+    padding: 12px 16px;
     border-radius: 50px;
     border: 2px solid #ddd;
     font-size: 1rem;
     transition: 0.3s;
 }
 
-.input-area input:focus {
+.task-form input:focus,
+.task-form select:focus {
     border-color: #3498db;
     outline: none;
     box-shadow: 0 0 0 3px rgba(52,152,219,0.2);
 }
 
-.input-area button {
-    padding: 14px 30px;
+.task-form #taskInput {
+    flex: 2;
+    min-width: 180px;
+}
+
+.task-form #taskDate {
+    flex: 1;
+    min-width: 140px;
+}
+
+.task-form #taskCategory {
+    flex: 1;
+    min-width: 120px;
+    background: white;
+}
+
+.task-form #addTaskBtn {
     background: #2c3e50;
     color: white;
     border: none;
-    border-radius: 50px;
-    font-weight: 600;
+    padding: 12px 25px;
     cursor: pointer;
-    transition: 0.3s;
+    font-weight: 600;
+    flex: 0 1 auto;
 }
 
-.input-area button:hover {
+.task-form #addTaskBtn:hover {
     background: #34495e;
     transform: scale(1.02);
 }
 
-.quick-actions {
+/* ============================================
+   ফিল্টার সেকশন
+   ============================================ */
+.filter-section {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
-    margin: 12px 0;
+    margin-bottom: 20px;
 }
 
-.quick-actions .action {
-    flex: 1 0 auto;
-    padding: 12px 16px;
+.filter-section select,
+.filter-section input,
+.filter-section button {
+    padding: 10px 16px;
+    border-radius: 50px;
+    border: 2px solid #ddd;
+    font-size: 0.95rem;
+    transition: 0.3s;
+}
+
+.filter-section #filterCategory {
+    flex: 1;
+    min-width: 120px;
+    background: white;
+}
+
+.filter-section #searchInput {
+    flex: 2;
+    min-width: 150px;
+}
+
+.filter-section #clearAllBtn {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.filter-section #clearAllBtn:hover {
+    background: #c0392b;
+}
+
+/* ============================================
+   টাস্ক লিস্ট
+   ============================================ */
+.task-list {
+    min-height: 200px;
+    margin-bottom: 20px;
+}
+
+.task-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f8f9fa;
+    padding: 14px 18px;
+    border-radius: 15px;
+    margin-bottom: 10px;
+    border-left: 5px solid #3498db;
+    animation: slideIn 0.3s ease;
+    transition: 0.3s;
+}
+
+.task-item:hover {
+    background: #edf2f7;
+    transform: translateX(5px);
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.task-item.completed {
+    border-left-color: #27ae60;
+    opacity: 0.7;
+}
+
+.task-item.completed .task-text {
+    text-decoration: line-through;
+    color: #7f8c8d;
+}
+
+.task-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+}
+
+.task-text {
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 1.05rem;
+}
+
+.task-meta {
+    display: flex;
+    gap: 12px;
+    font-size: 0.85rem;
+    color: #7f8c8d;
+}
+
+.task-meta .category {
+    background: #ecf0f1;
+    padding: 2px 12px;
+    border-radius: 50px;
+    font-weight: 500;
+}
+
+.task-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.task-actions button {
+    padding: 6px 14px;
     border: none;
     border-radius: 50px;
-    background: #ecf0f1;
-    color: #2c3e50;
-    font-weight: 600;
+    font-size: 0.85rem;
     cursor: pointer;
+    font-weight: 500;
     transition: 0.3s;
-    font-size: 0.9rem;
 }
 
-.quick-actions .action:hover {
-    background: #3498db;
+.task-actions .complete-btn {
+    background: #27ae60;
     color: white;
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(52,152,219,0.3);
 }
 
-.quick-questions {
-    margin: 15px 0 10px;
+.task-actions .complete-btn:hover {
+    background: #229954;
 }
 
-.hint {
-    font-weight: 600;
-    color: #2c3e50;
-    margin-bottom: 8px;
-    font-size: 0.9rem;
+.task-actions .edit-btn {
+    background: #f39c12;
+    color: white;
 }
 
-.question-chips {
+.task-actions .edit-btn:hover {
+    background: #d68910;
+}
+
+.task-actions .delete-btn {
+    background: #e74c3c;
+    color: white;
+}
+
+.task-actions .delete-btn:hover {
+    background: #c0392b;
+}
+
+/* ============================================
+   টাস্ক স্ট্যাটস
+   ============================================ */
+.task-stats {
     display: flex;
+    justify-content: space-around;
     flex-wrap: wrap;
-    gap: 8px;
-}
-
-.chip {
-    background: #e8f0fe;
-    padding: 8px 16px;
-    border-radius: 50px;
-    font-size: 0.85rem;
+    gap: 10px;
+    padding: 15px;
+    background: #ecf0f1;
+    border-radius: 15px;
+    font-weight: 600;
     color: #2c3e50;
-    cursor: pointer;
-    border: 1px solid #d0d7de;
-    transition: 0.3s;
 }
 
-.chip:hover {
-    background: #3498db;
-    color: white;
-    border-color: #3498db;
-    transform: translateY(-2px);
+.task-stats span {
+    font-size: 0.95rem;
 }
 
-footer {
-    margin-top: 20px;
+/* ============================================
+   খালি অবস্থা
+   ============================================ */
+.empty-state {
     text-align: center;
-    color: #7f8c8d;
-    font-size: 0.85rem;
-    border-top: 2px dashed #ecf0f1;
-    padding-top: 15px;
+    padding: 40px 20px;
+    color: #bdc3c7;
 }
 
-.chat-box::-webkit-scrollbar {
-    width: 6px;
-}
-.chat-box::-webkit-scrollbar-thumb {
-    background: #bdc3c7;
-    border-radius: 10px;
+.empty-state h3 {
+    font-size: 1.3rem;
+    margin-bottom: 5px;
 }
 
-/* রেসপন্সিভ */
+/* ============================================
+   মোবাইল রেসপন্সিভ
+   ============================================ */
 @media (max-width: 600px) {
     .container { padding: 15px; }
-    .advisor-profile { flex-direction: column; text-align: center; }
-    .avatar { width: 60px; height: 60px; font-size: 2.8rem; }
-    header h1 { font-size: 1.2rem; }
-    .lock-box h2 { font-size: 1.4rem; }
+    header h1 { font-size: 1.6rem; }
+    .task-form input,
+    .task-form select,
+    .task-form button {
+        font-size: 0.9rem;
+        padding: 10px 14px;
+    }
+    .task-item {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+    .task-actions {
+        justify-content: flex-end;
+    }
+    .task-stats {
+        flex-direction: column;
+        align-items: center;
+        gap: 5px;
+    }
 }

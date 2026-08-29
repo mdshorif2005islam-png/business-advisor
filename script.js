@@ -1,269 +1,258 @@
-// ============================================
-// ফ্রি নলেজ ইঞ্জিন — উইকিপিডিয়া + নিউজ + লোকাল
-// ============================================
+// ============================================================
+// টাস্ক ম্যানেজার অ্যাপ - সম্পূর্ণ লজিক
+// ============================================================
 
+// ============================================================
+// ১. ডেটা স্টোরেজ (LocalStorage)
+// ============================================================
+
+// LocalStorage থেকে টাস্ক লোড করা
+function loadTasks() {
+    const stored = localStorage.getItem('tasks');
+    return stored ? JSON.parse(stored) : [];
+}
+
+// LocalStorage-এ টাস্ক সেভ করা
+function saveTasks(tasks) {
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+}
+
+// ============================================================
+// ২. টাস্ক ক্রিয়েশন
+// ============================================================
+
+// নতুন টাস্ক তৈরি করা
+function createTask(text, date, category) {
+    return {
+        id: Date.now(), // ইউনিক আইডি
+        text: text,
+        date: date,
+        category: category,
+        completed: false,
+        createdAt: new Date().toISOString()
+    };
+}
+
+// ============================================================
+// ৩. টাস্ক রেন্ডারিং (ডিসপ্লে)
+// ============================================================
+
+// টাস্ক লিস্ট রেন্ডার করা
+function renderTasks(tasks) {
+    const taskList = document.getElementById('taskList');
+    
+    if (tasks.length === 0) {
+        taskList.innerHTML = `
+            <div class="empty-state">
+                <h3>📭 কোনো টাস্ক নেই</h3>
+                <p>উপরে নতুন টাস্ক যোগ করুন!</p>
+            </div>
+        `;
+        updateStats(tasks);
+        return;
+    }
+
+    let html = '';
+    tasks.forEach(task => {
+        const completedClass = task.completed ? 'completed' : '';
+        const dateDisplay = task.date ? `📅 ${formatDate(task.date)}` : '';
+        
+        html += `
+            <div class="task-item ${completedClass}" data-id="${task.id}">
+                <div class="task-info">
+                    <div class="task-text">${escapeHtml(task.text)}</div>
+                    <div class="task-meta">
+                        <span class="category">${task.category || 'জেনারেল'}</span>
+                        ${dateDisplay ? `<span>${dateDisplay}</span>` : ''}
+                    </div>
+                </div>
+                <div class="task-actions">
+                    <button class="complete-btn" onclick="toggleTask(${task.id})">
+                        ${task.completed ? '↩️ ফিরিয়ে নিন' : '✅ সম্পন্ন'}
+                    </button>
+                    <button class="edit-btn" onclick="editTask(${task.id})">✏️</button>
+                    <button class="delete-btn" onclick="deleteTask(${task.id})">🗑️</button>
+                </div>
+            </div>
+        `;
+    });
+
+    taskList.innerHTML = html;
+    updateStats(tasks);
+}
+
+// ============================================================
+// ৪. হেল্পার ফাংশন
+// ============================================================
+
+// HTML এস্কেপ (XSS প্রতিরোধ)
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// তারিখ ফরম্যাট
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('bn-BD', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric'
+    });
+}
+
+// ============================================================
+// ৫. টাস্ক অপারেশন (CRUD)
+// ============================================================
+
+// টাস্ক যোগ করা
+function addTask() {
+    const input = document.getElementById('taskInput');
+    const dateInput = document.getElementById('taskDate');
+    const categorySelect = document.getElementById('taskCategory');
+    
+    const text = input.value.trim();
+    if (!text) {
+        alert('⚠️ দয়া করে একটি টাস্ক লিখুন!');
+        return;
+    }
+
+    const tasks = loadTasks();
+    const newTask = createTask(text, dateInput.value, categorySelect.value);
+    tasks.push(newTask);
+    saveTasks(tasks);
+    renderTasks(tasks);
+
+    // ইনপুট ফিল্ড খালি করা
+    input.value = '';
+    dateInput.value = '';
+    input.focus();
+}
+
+// টাস্ক টগল (সম্পন্ন/অসম্পন্ন)
+function toggleTask(id) {
+    const tasks = loadTasks();
+    const task = tasks.find(t => t.id === id);
+    if (task) {
+        task.completed = !task.completed;
+        saveTasks(tasks);
+        renderTasks(tasks);
+    }
+}
+
+// টাস্ক ডিলিট
+function deleteTask(id) {
+    if (confirm('🗑️ এই টাস্কটি ডিলিট করতে চান?')) {
+        let tasks = loadTasks();
+        tasks = tasks.filter(t => t.id !== id);
+        saveTasks(tasks);
+        renderTasks(tasks);
+    }
+}
+
+// টাস্ক এডিট
+function editTask(id) {
+    const tasks = loadTasks();
+    const task = tasks.find(t => t.id === id);
+    if (!task) return;
+
+    const newText = prompt('✏️ টাস্ক আপডেট করুন:', task.text);
+    if (newText !== null && newText.trim() !== '') {
+        task.text = newText.trim();
+        saveTasks(tasks);
+        renderTasks(tasks);
+    }
+}
+
+// ============================================================
+// ৬. ফিল্টার ও সার্চ
+// ============================================================
+
+// ফিল্টার করা টাস্ক পাওয়া
+function getFilteredTasks() {
+    const tasks = loadTasks();
+    const category = document.getElementById('filterCategory').value;
+    const search = document.getElementById('searchInput').value.toLowerCase().trim();
+
+    let filtered = tasks;
+
+    // ক্যাটাগরি ফিল্টার
+    if (category !== 'সব') {
+        filtered = filtered.filter(t => t.category === category);
+    }
+
+    // সার্চ ফিল্টার
+    if (search) {
+        filtered = filtered.filter(t => 
+            t.text.toLowerCase().includes(search)
+        );
+    }
+
+    return filtered;
+}
+
+// ফিল্টার প্রয়োগ
+function applyFilters() {
+    const filtered = getFilteredTasks();
+    renderTasks(filtered);
+}
+
+// ============================================================
+// ৭. পরিসংখ্যান (স্ট্যাটস)
+// ============================================================
+
+// টাস্ক স্ট্যাটস আপডেট
+function updateStats(tasks) {
+    const total = tasks.length;
+    const completed = tasks.filter(t => t.completed).length;
+    const pending = total - completed;
+
+    document.getElementById('totalTasks').textContent = total;
+    document.getElementById('completedTasks').textContent = completed;
+    document.getElementById('pendingTasks').textContent = pending;
+}
+
+// ============================================================
+// ৮. সব টাস্ক ডিলিট
+// ============================================================
+
+function clearAllTasks() {
+    if (confirm('⚠️ সব টাস্ক ডিলিট করতে চান? এই কাজটি পূর্বাবস্থায় ফেরানো যাবে না!')) {
+        saveTasks([]);
+        renderTasks([]);
+    }
+}
+
+// ============================================================
+// ৯. ইভেন্ট লিসেনার
+// ============================================================
+
+// DOM রেডি হলে
 document.addEventListener('DOMContentLoaded', function() {
+    // টাস্ক লোড
+    const tasks = loadTasks();
+    renderTasks(tasks);
 
-    // ============================================
-    // ১. পাসওয়ার্ড সিস্টেম (আগের মতো)
-    // ============================================
-    var CORRECT_PASSWORD = 'shorif123';
-    var MAX_ATTEMPTS = 5;
-    var attempts = 0;
-
-    var lockScreen = document.getElementById('lockScreen');
-    var mainContent = document.getElementById('mainContent');
-    var passwordInput = document.getElementById('passwordInput');
-    var unlockBtn = document.getElementById('unlockBtn');
-    var lockError = document.getElementById('lockError');
-
-    function unlockApp() {
-        lockScreen.style.display = 'none';
-        mainContent.style.display = 'block';
-        passwordInput.value = '';
-        lockError.innerHTML = '';
-        attempts = 0;
-    }
-
-    function showError(msg) {
-        lockError.innerHTML = msg;
-        passwordInput.value = '';
-        passwordInput.focus();
-    }
-
-    unlockBtn.addEventListener('click', function() {
-        var entered = passwordInput.value.trim();
-        if (entered === '') {
-            showError('⚠️ দয়া করে কোড দিন।');
-            return;
-        }
-        if (entered === CORRECT_PASSWORD) {
-            unlockApp();
-        } else {
-            attempts++;
-            var remaining = MAX_ATTEMPTS - attempts;
-            if (remaining > 0) {
-                showError('❌ ভুল কোড! ' + remaining + ' বার চেষ্টা বাকি।');
-            } else {
-                showError('🔒 অনেকবার ভুল কোড দেওয়ায় লক হয়ে গেছে। পেজ রিফ্রেশ করুন।');
-                passwordInput.disabled = true;
-                unlockBtn.disabled = true;
-            }
-        }
+    // অ্যাড বাটন
+    document.getElementById('addTaskBtn').addEventListener('click', addTask);
+    
+    // এন্টার কী
+    document.getElementById('taskInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') addTask();
     });
 
-    passwordInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') unlockBtn.click();
-    });
+    // ফিল্টার
+    document.getElementById('filterCategory').addEventListener('change', applyFilters);
+    document.getElementById('searchInput').addEventListener('input', applyFilters);
 
-    window.addEventListener('load', function() {
-        lockScreen.style.display = 'flex';
-        mainContent.style.display = 'none';
-        passwordInput.disabled = false;
-        unlockBtn.disabled = false;
-        attempts = 0;
-        lockError.innerHTML = '';
-    });
+    // ক্লিয়ার অল
+    document.getElementById('clearAllBtn').addEventListener('click', clearAllTasks);
+});
 
-    // ============================================
-    // ২. চ্যাট এলিমেন্ট সিলেক্ট
-    // ============================================
-    var chatBox = document.getElementById('chatBox');
-    var userInput = document.getElementById('userInput');
-    var sendBtn = document.getElementById('sendBtn');
-    var actionBtns = document.querySelectorAll('.action');
-    var chips = document.querySelectorAll('.chip');
-
-    // ============================================
-    // ৩. উইকিপিডিয়া থেকে তথ্য আনা (ফ্রি)
-    // ============================================
-    async function getWikipediaInfo(query) {
-        try {
-            // প্রথমে বাংলা উইকিপিডিয়া চেষ্টা
-            var bnUrl = `https://bn.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(query)}`;
-            var response = await fetch(bnUrl);
-            
-            if (response.ok) {
-                var data = await response.json();
-                if (data.extract) {
-                    return data.extract;
-                }
-            }
-
-            // না পেলে ইংরেজি উইকিপিডিয়া
-            var enUrl = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(query)}`;
-            response = await fetch(enUrl);
-            if (response.ok) {
-                data = await response.json();
-                if (data.extract) {
-                    return data.extract;
-                }
-            }
-            return null;
-        } catch (error) {
-            return null;
-        }
-    }
-
-    // ============================================
-    // ৪. গুগল নিউজ থেকে খবর আনা (ফ্রি RSS)
-    // ============================================
-    async function getNews(query) {
-        try {
-            var url = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=bn&gl=BD&ceid=BD:bn`;
-            var response = await fetch('https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(url));
-            
-            if (response.ok) {
-                var data = await response.json();
-                if (data.items && data.items.length > 0) {
-                    var newsText = '📰 সর্বশেষ খবর:\n';
-                    for (var i = 0; i < Math.min(3, data.items.length); i++) {
-                        newsText += `✅ ${data.items[i].title}\n`;
-                    }
-                    return newsText;
-                }
-            }
-            return null;
-        } catch (error) {
-            return null;
-        }
-    }
-
-    // ============================================
-    // ৫. লোকাল ডেটাবেস (দ্রুত উত্তরের জন্য)
-    // ============================================
-    function getLocalAnswer(q) {
-        // ব্যবসা সম্পর্কিত
-        if (q.includes('আইডিয়া') || q.includes('ব্যবসা') || q.includes('কী ব্যবসা')) {
-            var ideas = [
-                "🛒 অনলাইন গ্রোসারি ডেলিভারি (স্থানীয় সবজি-মাছ)",
-                "👕 ইকো-ফ্রেন্ডলি ফ্যাশন ব্র্যান্ড (বাঁশ/জুটের তৈরি)",
-                "🍱 টিফিন সার্ভিস (অফিস/কলেজের জন্য হোমমেড খাবার)",
-                "📱 মোবাইল ফোন রিপেয়ার ও এক্সেসরিজ শপ",
-                "🎓 অনলাইন টিউটোরিয়াল (স্কুল/কলেজ বিষয়)",
-                "🧹 প্রফেশনাল হোম ক্লিনিং সার্ভিস"
-            ];
-            return "💡 " + ideas[Math.floor(Math.random() * ideas.length)];
-        }
-
-        // লাভ
-        if (q.includes('লাভ') || q.includes('বাড়াতে') || q.includes('মুনাফা')) {
-            return "📈 স্যার, লাভ বাড়ানোর জন্য:\n✅ খরচ কমানো (সাপ্লায়ার পরিবর্তন)\n✅ নতুন পণ্য যোগ করা\n✅ অনলাইন মার্কেটিং বাড়ানো\n✅ গ্রাহকদের ফিডব্যাক নেওয়া";
-        }
-
-        // বিনিয়োগ
-        if (q.includes('বিনিয়োগ') || q.includes('ইনভেস্ট')) {
-            return "🏦 স্যার, বিনিয়োগের আগে:\n✅ মার্কেট রিসার্চ করুন\n✅ ছোট স্কেলে টেস্ট করুন\n✅ ৬ মাসের ক্যাশ ফ্লো প্ল্যান করুন";
-        }
-
-        // মার্কেটিং
-        if (q.includes('মার্কেটিং') || q.includes('বিপণন') || q.includes('প্রচার')) {
-            return "📣 স্যার, মার্কেটিং টিপস:\n✅ ফেসবুক/ইনস্টাগ্রামে টার্গেটেড বিজ্ঞাপন\n✅ গ্রাহক রেফারেল প্রোগ্রাম\n✅ লোকাল ইভেন্টে স্পনসর";
-        }
-
-        // গ্রিটিং
-        if (q.includes('আসসালামু') || q.includes('সালাম') || q.includes('হ্যালো') || q.includes('হাই')) {
-            return "ওয়ালাইকুম আসসালাম, স্যার! আমি আপনার সেবায় আছি। কীভাবে সাহায্য করতে পারি?";
-        }
-
-        return null; // না পেলে null রিটার্ন
-    }
-
-    // ============================================
-    // ৬. প্রধান উত্তর দান ফাংশন (হাইব্রিড)
-    // ============================================
-    async function getAdvisorReply(question) {
-        var q = question.toLowerCase().trim();
-
-        // ১. লোকাল ডেটাবেস চেক (দ্রুত)
-        var localAnswer = getLocalAnswer(q);
-        if (localAnswer) return localAnswer;
-
-        // ২. উইকিপিডিয়া চেক
-        var wikiAnswer = await getWikipediaInfo(q);
-        if (wikiAnswer) {
-            return "📚 উইকিপিডিয়া থেকে:\n" + wikiAnswer;
-        }
-
-        // ৩. নিউজ চেক
-        var newsAnswer = await getNews(q);
-        if (newsAnswer) {
-            return newsAnswer;
-        }
-
-        // ৪. কিছুই না পেলে
-        return "🤔 স্যার, আমি এই বিষয়ে তথ্য পাচ্ছি না। দয়া করে আরও সহজভাবে প্রশ্নটি বলুন।";
-    }
-
-    // ============================================
-    // ৭. মেসেজ যোগ করার ফাংশন
-    // ============================================
-    function addMessage(sender, text) {
-        var msgDiv = document.createElement('div');
-        msgDiv.className = sender === 'advisor' ? 'advisor-msg' : 'user-msg';
-        msgDiv.innerHTML = text.replace(/\n/g, '<br>');
-        chatBox.appendChild(msgDiv);
-        chatBox.scrollTop = chatBox.scrollHeight;
-    }
-
-    // ============================================
-    // ৮. SEND বাটন (Async)
-    // ============================================
-    sendBtn.addEventListener('click', async function() {
-        var msg = userInput.value.trim();
-        if (msg === '') return;
-
-        addMessage('user', msg);
-        
-        // লোডিং মেসেজ
-        var loadingId = 'loading-' + Date.now();
-        var loadingDiv = document.createElement('div');
-        loadingDiv.className = 'advisor-msg';
-        loadingDiv.id = loadingId;
-        loadingDiv.innerHTML = '🤔 খুঁজছি...';
-        chatBox.appendChild(loadingDiv);
-        chatBox.scrollTop = chatBox.scrollHeight;
-
-        var reply = await getAdvisorReply(msg);
-        
-        // লোডিং মেসেজ রিপ্লেস
-        var loadingElement = document.getElementById(loadingId);
-        if (loadingElement) {
-            loadingElement.innerHTML = reply.replace(/\n/g, '<br>');
-        }
-        userInput.value = '';
-    });
-
-    // এন্টার প্রেস
-    userInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') sendBtn.click();
-    });
-
-    // ============================================
-    // ৯. কুইক অ্যাকশন বাটন
-    // ============================================
-    actionBtns.forEach(function(btn) {
-        btn.addEventListener('click', function() {
-            var action = this.dataset.action;
-            var question = '';
-            if (action === 'idea') question = 'ব্যবসার আইডিয়া দিন';
-            else if (action === 'profit') question = 'লাভ কীভাবে বাড়াব?';
-            else if (action === 'market') question = 'মার্কেটিং টিপস দিন';
-            else if (action === 'invest') question = 'বিনিয়োগ পরামর্শ দিন';
-            else if (action === 'document') question = 'ডকুমেন্ট প্রস্তাব তৈরি করুন';
-            userInput.value = question;
-            sendBtn.click();
-        });
-    });
-
-    // ============================================
-    // ১০. চিপস (দ্রুত প্রশ্ন)
-    // ============================================
-    chips.forEach(function(chip) {
-        chip.addEventListener('click', function() {
-            userInput.value = this.dataset.question;
-            sendBtn.click();
-        });
-    });
-
-}); // DOMContentLoaded শেষ
+// ============================================================
+// ১০. গ্লোবাল ফাংশন (HTML-এ onclick কাজ করার জন্য)
+// ============================================================
+window.toggleTask = toggleTask;
+window.deleteTask = deleteTask;
+window.editTask = editTask;
