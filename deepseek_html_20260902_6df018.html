@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PropertyHub BD</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/styles.css" />
+</head>
+<body>
+    <header class="topbar">
+        <div class="container nav">
+            <a class="brand" href="#"><span class="brand-mark"><i class="fas fa-building"></i></span>PropertyHub<span class="bd">BD</span></a>
+            <nav class="nav-links">
+                <a class="active" href="#properties"><i class="fas fa-home"></i> Properties</a>
+                <a href="#areas"><i class="fas fa-map-marker-alt"></i> Areas</a>
+                <a href="#agents"><i class="fas fa-user-tie"></i> Agents</a>
+                <a href="#guides"><i class="fas fa-book"></i> Guides</a>
+            </nav>
+            <div class="nav-actions">
+                <div id="authButtons">
+                    <button class="login" onclick="openAuthModal('login')"><i class="fas fa-user-circle"></i> Login</button>
+                    <button class="signup" onclick="openAuthModal('signup')"><i class="fas fa-user-plus"></i> Sign Up</button>
+                </div>
+                <div id="userProfile" style="display:none;">
+                    <button class="post-btn" onclick="openPostModal()"><i class="fas fa-plus-circle"></i> Post Property</button>
+                    <button class="profile-btn" onclick="toggleProfileMenu()"><i class="fas fa-user-circle"></i> <span id="userName">User</span></button>
+                    <div class="profile-dropdown" id="profileDropdown">
+                        <a href="#"><i class="fas fa-user"></i> Profile</a>
+                        <a href="#"><i class="fas fa-list"></i> My Listings</a>
+                        <a href="#"><i class="fas fa-heart"></i> Favorites</a>
+                        <a href="#" onclick="logoutUser()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </div>
+                </div>
+                <button class="theme-toggle-btn" onclick="toggleDarkMode()"><i class="fas fa-moon"></i></button>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container hero-inner">
+            <div>
+                <p class="eyebrow"><i class="fas fa-tag"></i> BANGLADESH PROPERTY MARKETPLACE</p>
+                <h1>Find your next <span>property</span>.</h1>
+                <p class="hero-copy">Buy, sell or rent flats, houses, land and commercial spaces.</p>
+                <div class="stats-bar">
+                    <div><i class="fas fa-building" style="color:#ff5a1f;"></i><strong id="totalListings">0</strong><span>Listings</span></div>
+                    <div><i class="fas fa-user-check" style="color:#1d9b67;"></i><strong>1,200+</strong><span>Agents</span></div>
+                    <div><i class="fas fa-star" style="color:#f59e0b;"></i><strong>95%</strong><span>Satisfaction</span></div>
+                </div>
+            </div>
+            <div class="hero-image">
+                <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=400&q=75&fm=webp" alt="Property" loading="lazy" />
+            </div>
+        </div>
+        <div class="container search-panel">
+            <div class="search-tabs">
+                <button class="tab active" data-mode="buy"><i class="fas fa-shopping-bag"></i> Buy</button>
+                <button class="tab" data-mode="rent"><i class="fas fa-key"></i> Rent</button>
+                <button class="tab" data-mode="land"><i class="fas fa-tree"></i> Land</button>
+                <button class="tab" data-mode="commercial"><i class="fas fa-store"></i> Commercial</button>
+            </div>
+            <div class="search-grid">
+                <label><span><i class="fas fa-map-pin"></i> Location</span>
+                    <select id="location"><option value="">All</option><option>Dhaka</option><option>Chattogram</option><option>Nilphamari</option></select>
+                </label>
+                <label><span><i class="fas fa-tag"></i> Type</span>
+                    <select id="type"><option value="">Any</option><option>Apartment</option><option>House</option><option>Land</option><option>Commercial</option></select>
+                </label>
+                <label><span><i class="fas fa-arrow-down"></i> Min</span>
+                    <input id="minPrice" type="number" placeholder="৳ 0" />
+                </label>
+                <label><span><i class="fas fa-arrow-up"></i> Max</span>
+                    <input id="maxPrice" type="number" placeholder="৳ 5,00,00,000" />
+                </label>
+                <button class="search-btn" onclick="filterProperties()"><i class="fas fa-search"></i> Search</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="container content" id="properties">
+        <aside class="filters">
+            <div class="filter-head"><h3><i class="fas fa-sliders-h"></i> Filter</h3><button onclick="resetFilters()"><i class="fas fa-undo"></i> Reset</button></div>
+            <div class="filter-block"><h4><i class="fas fa-building"></i> Type</h4>
+                <label class="check"><input class="type-check" value="Apartment" type="checkbox"> Apartments</label>
+                <label class="check"><input class="type-check" value="House" type="checkbox"> Houses</label>
+                <label class="check"><input class="type-check" value="Land" type="checkbox"> Land</label>
+                <label class="check"><input class="type-check" value="Commercial" type="checkbox"> Commercial</label>
+            </div>
+            <div class="filter-block"><h4><i class="fas fa-bed"></i> Bedrooms</h4>
+                <div class="chips"><button>1</button><button>2</button><button>3</button><button>4+</button></div>
+            </div>
+            <div class="tip"><strong><i class="fas fa-lightbulb"></i> Smart search</strong><p>Use location + budget to find properties faster.</p></div>
+        </aside>
+        <section class="results">
+            <div class="results-head">
+                <div><h2><i class="fas fa-list"></i> Properties</h2><p id="resultCount">0 results</p></div>
+                <select id="sort" onchange="sortProperties()">
+                    <option value="new">Newest</option>
+                    <option value="low">Price: Low to high</option>
+                    <option value="high">Price: High to low</option>
+                </select>
+            </div>
+            <div class="listing-grid" id="listingGrid"></div>
+            <div class="pagination" id="pagination"></div>
+        </section>
+    </section>
+
+    <section class="container categories" id="areas">
+        <div class="section-title"><div><p class="eyebrow"><i class="fas fa-compass"></i> EXPLORE</p><h2>Popular categories</h2></div><a href="#properties">View all →</a></div>
+        <div class="category-grid">
+            <div class="category"><span><i class="fas fa-building"></i></span><div><b>Flats for Sale</b><small>2,004+ listings</small></div></div>
+            <div class="category"><span><i class="fas fa-home"></i></span><div><b>Houses for Rent</b><small>3,557+ listings</small></div></div>
+            <div class="category"><span><i class="fas fa-tree"></i></span><div><b>Land & Plots</b><small>4,213+ listings</small></div></div>
+            <div class="category"><span><i class="fas fa-store"></i></span><div><b>Commercial Space</b><small>3,024+ listings</small></div></div>
+        </div>
+    </section>
+
+    <section class="container agents-section" id="agents">
+        <div class="section-title"><div><p class="eyebrow"><i class="fas fa-user-tie"></i> TOP AGENTS</p><h2>Trusted agents</h2></div><a href="#">View all →</a></div>
+        <div class="agents-grid" id="agentsGrid"></div>
+    </section>
+
+    <footer id="guides">
+        <div class="container footer">
+            <div><a class="brand" href="#"><span class="brand-mark"><i class="fas fa-building"></i></span>PropertyHub<span class="bd">BD</span></a><p>Buy smarter. Sell faster.</p>
+                <div class="social-links"><a href="#"><i class="fab fa-facebook-f"></i></a><a href="#"><i class="fab fa-twitter"></i></a><a href="#"><i class="fab fa-linkedin-in"></i></a></div>
+            </div>
+            <div><b><i class="fas fa-store"></i> Marketplace</b><a href="#">Buy property</a><a href="#">Rent property</a><a href="#">Post property</a></div>
+            <div><b><i class="fas fa-life-ring"></i> Support</b><a href="#">Safety tips</a><a href="#">Help center</a><a href="#">Contact</a></div>
+        </div>
+        <div class="footer-bottom"><div class="container"><p><i class="far fa-copyright"></i> 2024 PropertyHub BD</p><p><i class="fas fa-phone"></i> +880 17XX-XXXXXX</p></div></div>
+    </footer>
+
+    <!-- Modals -->
+    <div class="modal" id="authModal">
+        <div class="modal-card">
+            <button class="close" onclick="closeAuthModal()"><i class="fas fa-times"></i></button>
+            <div id="authContent">
+                <h2 id="authTitle"><i class="fas fa-user-circle" style="color:#ff5a1f;"></i> Login</h2>
+                <form id="authForm" onsubmit="handleAuth(event)">
+                    <div id="signupFields" style="display:none;">
+                        <input type="text" id="fullName" placeholder="Full Name" required />
+                        <input type="text" id="phone" placeholder="Phone" required />
+                    </div>
+                    <input type="email" id="authEmail" placeholder="Email" required />
+                    <input type="password" id="authPassword" placeholder="Password" required minlength="6" />
+                    <button type="submit" class="search-btn" id="authSubmitBtn"><i class="fas fa-arrow-right"></i> Login</button>
+                </form>
+                <p id="authToggle">Don't have an account? <a href="#" onclick="toggleAuthMode()">Sign Up</a></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="postModal">
+        <div class="modal-card">
+            <button class="close" onclick="closePostModal()"><i class="fas fa-times"></i></button>
+            <h2><i class="fas fa-plus-circle" style="color:#ff5a1f;"></i> Post Property</h2>
+            <form id="postPropertyForm" onsubmit="postProperty(event)">
+                <input type="text" id="propertyTitle" placeholder="Property Title" required />
+                <select id="propertyType" required><option value="">Select Type</option><option>Apartment</option><option>House</option><option>Land</option><option>Commercial</option></select>
+                <input type="text" id="propertyLocation" placeholder="Location" required />
+                <input type="number" id="propertyPrice" placeholder="Price (BDT)" required />
+                <input type="text" id="propertyMeta" placeholder="Details (3 Beds • 2 Baths)" />
+                <select id="propertyStatus" required><option value="sale">For Sale</option><option value="rent">For Rent</option></select>
+                <button type="submit" class="search-btn"><i class="fas fa-arrow-right"></i> Submit</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="detailModal">
+        <div class="modal-card detail-card">
+            <button class="close" onclick="closeDetail()"><i class="fas fa-times"></i></button>
+            <div id="detailContent">
+                <div class="detail-image" id="detailImage"></div>
+                <h2 id="detailTitle"></h2>
+                <div class="detail-price" id="detailPrice"></div>
+                <div class="detail-meta" id="detailMeta"></div>
+                <div class="detail-location" id="detailLocation"></div>
+                <div class="detail-actions">
+                    <button onclick="shareProperty()" class="share-btn"><i class="fas fa-share-alt"></i> Share</button>
+                    <button onclick="contactAgent()" class="contact-btn"><i class="fab fa-whatsapp"></i> Contact</button>
+                </div>
+                <div class="detail-features">
+                    <h4><i class="fas fa-check-circle" style="color:#1d9b67;"></i> Features</h4>
+                    <ul><li><i class="fas fa-check" style="color:#1d9b67;"></i> Verified</li><li><i class="fas fa-check" style="color:#1d9b67;"></i> Clear Title</li></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/app.js"></script>
+</body>
+</html>
